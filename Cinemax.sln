@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36429.23 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cinemax", "Cinemax\Cinemax.csproj", "{73F352CA-0CF3-473C-855C-63534DBC567E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{73F352CA-0CF3-473C-855C-63534DBC567E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73F352CA-0CF3-473C-855C-63534DBC567E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73F352CA-0CF3-473C-855C-63534DBC567E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73F352CA-0CF3-473C-855C-63534DBC567E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {645EED06-DE52-4EC2-8853-19C0C7A8E357}
+	EndGlobalSection
+EndGlobal
