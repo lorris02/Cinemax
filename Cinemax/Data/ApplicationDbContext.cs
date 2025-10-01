@@ -10,8 +10,8 @@ namespace Cinemax.Data
             : base(options)
         {
         }
-        public DbSet<Movie> Movie { get; set; }
-        public DbSet<Review> Review{ get; set; }
+        public DbSet<Movie> Movies { get; set; }
+        public DbSet<Review> Reviews { get; set; }
         public DbSet<Genre> Genres { get; set; }
         
     }
