@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Cinemax.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cinemax.Data
@@ -9,5 +10,9 @@ namespace Cinemax.Data
             : base(options)
         {
         }
+        public DbSet<Movie> Movie { get; set; }
+        public DbSet<Review> Review{ get; set; }
+        public DbSet<Genre> Genres { get; set; }
+        
     }
 }
