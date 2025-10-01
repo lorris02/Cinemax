@@ -1,10 +1,11 @@
 ﻿
 
 using Cinemax.Data;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Cinemax.Controllers
 {
-    public class ReviewController 
+    public class ReviewController : Controller
     {
         //constructor to instantiate the db context
         private readonly ApplicationDbContext _context;
@@ -13,6 +14,9 @@ namespace Cinemax.Controllers
             _context = context;
         }
 
-
+        public  IActionResult Index()
+        {
+         return View();
+        }
     }
 }
