@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cinemax.Models
 {
@@ -7,9 +8,14 @@ namespace Cinemax.Models
         public string? ReviewerName { get; set; }
         public int ReviewId { get; set; }
         public string? ReviewMessage { get; set; }
+        [Range(0, 5)]
         public int Rating { get; set; }
 
         //foreign key, one movie can have many reviews
         public int MovieId { get; set; }
+        public Movie? Movie { get; set; }
+       
+
+
     }
 }
