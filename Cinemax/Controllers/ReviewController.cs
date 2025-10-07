@@ -78,8 +78,8 @@ namespace Cinemax.Controllers
             // validate the input
             if (!ModelState.IsValid)
             {
-                /// fetch list of movies for movieid dropdown in the form
-                ViewBag.MovieId = new SelectList(_context.Movies.ToList(), "MovieId", "MovieTitle");
+                /// fetch list of movies for movieid dropdown in the form,and it selects the movie that was originally selected
+                ViewBag.MovieId = new SelectList(_context.Movies.ToList(), "MovieId", "MovieTitle",review.MovieId);
 
                 // show the edit form with info the user provided
                 return View(review);

@@ -2,6 +2,7 @@
 using Cinemax.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace Cinemax.Controllers
 {
@@ -30,17 +31,15 @@ namespace Cinemax.Controllers
 
         [HttpPost]
         //post method to create a movie 
-        public IActionResult Create([Bind("MovieTitle,Director,ReleaseYear,Duration,Genre")] Movie movie)
+        public IActionResult Create([Bind("MovieId,MovieTitle,Director,ReleaseYear,Duration,GenreId")] Movie movie)
         {
-            //This gets the list of genres from the db and adds it to the form so users can pick the genre
-            ViewBag.GenreId = new SelectList(_context.Genres.ToList(), "GenreId", "Name");
-
+            
             //checks if the input is valid
             if (!ModelState.IsValid)
             {
                 ViewBag.GenreId = new SelectList(_context.Genres.ToList(), "GenreId", "Name"); 
 
-                return View(movie);
+                return View();
             }
 
             //adds the movie to the db
@@ -61,17 +60,18 @@ namespace Cinemax.Controllers
             {
                 return NotFound();
             }
+            ViewBag.GenreId = new SelectList(_context.Genres.ToList(), "GenreId", "Name");
             //return the movie to the view
             return View(movie);
         }
         [HttpPost]
         //post method to edit a movie
-        public IActionResult Edit(int id, [Bind("MovieTitle,Director,ReleaseYear,Duration")] Movie movie)
+        public IActionResult Edit(int id, [Bind("MovieId,MovieTitle,Director,ReleaseYear,Duration,GenreId")] Movie movie)
         {
             // validate the input of the user
             if (!ModelState.IsValid)
             {
-                ViewBag.GenreId = new SelectList(_context.Genres.ToList(), "GenreId", "Name");
+                ViewBag.GenreId = new SelectList(_context.Genres.ToList(), "GenreId","Name");
                 return View();
             }
 
