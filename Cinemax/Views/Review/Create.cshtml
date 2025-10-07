@@ -1,0 +1,45 @@
+﻿@model Cinemax.Models.Review
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h4>Write a Review</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ReviewerName" class="control-label">Name</label>
+                <input asp-for="ReviewerName" class="form-control" />
+                <span asp-validation-for="ReviewerName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReviewMessage" class="control-label">Review</label>
+                <input asp-for="ReviewMessage" class="form-control" />
+                <span asp-validation-for="ReviewMessage" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rating" class="control-label"></label>
+                <input asp-for="Rating" class="form-control" />
+                <span asp-validation-for="Rating" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MovieId" class="control-label">Movie Title</label>
+                <select asp-for="MovieId" class ="form-control" asp-items="ViewBag.MovieId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

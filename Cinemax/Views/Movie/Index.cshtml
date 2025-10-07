@@ -1,0 +1,71 @@
+﻿@model IEnumerable<Cinemax.Models.Movie>
+
+
+@{
+    ViewData["Title"] = "Index";
+}
+<h1>Explore Our Movie Collections</h1>
+<p>
+    Use the movie list below to explore your favorite directors, compare release dates,
+    or check out recent films added to our collection. Stay tuned, we’re always adding more classics and new releases,and also if you will like to <a asp-action="Create">add a Movie</a>,pls feel free
+</p>
+
+<p>
+    <a asp-action="Create">Add a New Movie</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+				Movie Title
+            </th>
+            <th>
+                Director
+            </th>
+            <th>
+                Genre
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GenreId)
+            </th>
+            <th>
+				Year Released
+            </th>
+            <th>
+				Movie Duration
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.MovieTitle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Director)
+            </td>
+            <td>
+                @item.Genre?.Name
+            </td>
+            <td>
+                    @Html.DisplayFor(modelItem => item.GenreId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReleaseYear)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DurationFormatted)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.MovieId">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.MovieId" onclick="return confirmDelete();">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<p>
+    Unsure which genre to pick? Check out our list of genres and their descriptions <a asp-area="" asp-controller="Genre" asp-action="Index">here</a>
+</p>

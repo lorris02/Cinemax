@@ -1,0 +1,74 @@
+﻿@model IEnumerable<Cinemax.Models.Review>
+
+@{
+    ViewData["Title"] = "Reviews";
+}
+
+<h1>Movie Reviews</h1>
+<p>
+    See what viewers like you are saying about our movie collection. Ratings and comments help others discover new favorites.
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Movie Title
+            </th>
+            <th>
+                Review
+            </th>
+            <th>
+                Rating
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MovieId)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReviewerName)
+            </td>
+            <td>
+                @item.Movie?.MovieTitle
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReviewMessage)
+            </td>
+                <td>
+                    @{
+                        int fullStars = item.Rating; // e.g., 4
+                        int emptyStars = 5 - fullStars;
+                    }
+                    @for (int i = 0; i < fullStars; i++)
+                    {
+                        <text>⭐</text>
+                    }
+                    @for (int i = 0; i < emptyStars; i++)
+                    {
+                        <text>☆</text>
+                    }
+                </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MovieId)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ReviewId">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ReviewId" onclick="return confirmDelete();">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<p>
+<p>
+    Want to share your thoughts? <a asp-action="Create">Add a review</a> today!
+</p>
+</p>

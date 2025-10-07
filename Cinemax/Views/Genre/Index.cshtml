@@ -1,0 +1,53 @@
+﻿@model IEnumerable<Cinemax.Models.Genre>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1></h1>
+
+<!--
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+-->
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Genre
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GenreId)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.GenreId)
+                </td>
+                
+            <!--
+					commented this,so users cannot edit or delete genres,since we havent added conditions for if a user/admin is logged in
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.GenreId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.GenreId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.GenreId">Delete</a>
+            </td>
+            -->
+        </tr>
+}
+    </tbody>
+</table>
