@@ -18,7 +18,7 @@ namespace Cinemax.Controllers
         //displays all data for the index view
         public IActionResult Index()
         {
-            var movies = _context.Movies.ToList();
+            var movies = _context.Movies.Include(m => m.Genre).ToList();
             return View(movies);
         }
         //create method to return the create view
