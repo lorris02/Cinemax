@@ -44,7 +44,7 @@
             </td>
                 <td>
                     @{
-                        int fullStars = item.Rating; // e.g., 4
+                        int fullStars = item.Rating; 
                         int emptyStars = 5 - fullStars;
                     }
                     @for (int i = 0; i < fullStars; i++)
@@ -67,8 +67,7 @@
 }
     </tbody>
 </table>
-<p>
+
 <p>
     Want to share your thoughts? <a asp-action="Create">Add a review</a> today!
-</p>
 </p>
