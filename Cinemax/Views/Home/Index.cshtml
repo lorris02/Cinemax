@@ -9,12 +9,12 @@
         You can browse, add, edit, or delete movies, manage genres, and explore reviews all in one clean and easy-to-use platform.
     </p>
     <p>
-        We feature movies across genres like Action, Comedy, Drama, Romance, and more. Each movie entry highlights essential details such as the director, release year, and duration — so you can easily discover films that match your taste.
+        We feature movies across genres like Action, Comedy, Drama, Romance, and more. Each movie entry highlights essential details such as the director, release year, and duration so that way you can easily discover films that match your taste.
         Whether you’re tracking your favorite films or organizing a watchlist,
         Cinemax helps you keep everything in one place.
-        Start by visiting the <a asp-area="" asp-controller="Movies" asp-action="Index">Movies</a> section to explore the full collection
+        Start by visiting the <a asp-area="" asp-controller="Movie" asp-action="Index">Movies</a> section to explore the full collection
     </p>
-    <p>Want to know what others think? Read the <a asp-area="" asp-controller="Reviews" asp-action="Index">Reviews</a> to find out which movies are fan favorites</p>
+    <p>Want to know what others think? Read the <a asp-area="" asp-controller="Review" asp-action="Index">Reviews</a> to find out which movies are fan favorites</p>
 </div>
 
 <h3>About CINEMAX</h3>
@@ -24,3 +24,54 @@
     to the latest blockbusters. Whether you’re searching by director, release year, or duration,
     CINEMAX makes discovering your next favorite movie effortless.
 </p>
+
+
+<section id="team">
+    <h3>Meet Our Team</h3>
+    <p>Behind CINEMAX is a passionate team of movie lovers, creators, and developers dedicated to bringing you the best movie experience. Each member contributes unique talent,from design and storytelling to coding and innovation.</p>
+
+    <div class="team-container">
+        <div class="team-card">
+            <img src="~/images/team1.jpg" alt="Lorris - Founder" />
+            <h4>Lorris</h4>
+            <p>Founder & Lead Developer</p>
+        </div>
+        <div class="team-card">
+            <img src="~/images/team2.jpg" alt="Ava - Designer" />
+            <h4>Ava</h4>
+            <p>UI/UX Designer</p>
+        </div>
+        <div class="team-card">
+            <img src="~/images/team3.jpg" alt="Mason - Backend Dev" />
+            <h4>Mason</h4>
+            <p>Backend Engineer</p>
+        </div>
+        <div class="team-card">
+            <img src="~/images/team4.jpg" alt="Nora - Content Creator" />
+            <h4>Nora</h4>
+            <p>Content Creator</p>
+        </div>
+    </div>
+</section>
+
+
+<section id="contact">
+    <h3>Contact Us</h3>
+    <p>We’d love to hear from you.Whether it’s feedback, partnership inquiries, or just to say hi, reach out below.</p>
+
+    <form method="post" action="#">
+        <div class="form-group">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" class="form-control" placeholder="Enter your name" required />
+        </div>
+        <div class="form-group">
+            <label for="email">Your Email</label>
+            <input type="email" id="email" class="form-control" placeholder="Enter your email" required />
+        </div>
+        <div class="form-group">
+            <label for="message">Your Message</label>
+            <textarea id="message" class="form-control" rows="4" placeholder="Type your message..." required></textarea>
+        </div>
+        <input type="submit" value="Send Message" />
+    </form>
+</section>
