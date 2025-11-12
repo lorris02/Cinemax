@@ -29,6 +29,7 @@ namespace Cinemax.Controllers
         }
         //post method to create a genre
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create([Bind("Name,Description")] Models.Genre genre)
         {
             if (!ModelState.IsValid)
@@ -51,6 +52,7 @@ namespace Cinemax.Controllers
         }
         //post method to edit a genre
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Edit([Bind("GenreId,Name,Description")] Models.Genre genre)
         {
             if (!ModelState.IsValid)

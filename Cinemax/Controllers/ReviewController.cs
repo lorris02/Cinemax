@@ -1,11 +1,13 @@
 ﻿using Cinemax.Data;
 using Cinemax.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cinemax.Controllers
 {
+    
     public class ReviewController : Controller
     {
         //constructor to instantiate the db context
@@ -27,6 +29,7 @@ namespace Cinemax.Controllers
         }
 
         //get method to return an empty form for the create view
+        [Authorize]
         public IActionResult Create()
         {
             // fetch list of movietitles for the movieid dropdown in the form
@@ -37,7 +40,10 @@ namespace Cinemax.Controllers
         }
 
         // post method to add a review
+        [Authorize]
         [HttpPost]
+        [ValidateAntiForgeryToken]
+
         public IActionResult Create([Bind("ReviewerName,ReviewMessage,ReviewId,Rating,MovieId")] Review review)
         {
             // validate inputs
@@ -55,6 +61,7 @@ namespace Cinemax.Controllers
         }
 
         //get method to return a populated form for the edit view
+        [Authorize]
         public IActionResult Edit(int id)
         {
             var review = _context.Reviews.Find(id);
@@ -71,8 +78,11 @@ namespace Cinemax.Controllers
             return View(review);
         }
 
+
         //post method to save the edited review
+        [Authorize]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, [Bind("ReviewerName,ReviewMessage,ReviewId,Rating,MovieId")] Review review)
         {
             // validate the input
@@ -92,6 +102,7 @@ namespace Cinemax.Controllers
         }
 
         //get method to confirm deletion of a review
+        [Authorize]
         public IActionResult Delete(int id)
         {
             var review = _context.Reviews.Find(id);

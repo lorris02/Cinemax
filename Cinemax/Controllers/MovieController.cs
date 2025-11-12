@@ -1,11 +1,13 @@
 ﻿using Cinemax.Data;
 using Cinemax.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cinemax.Controllers
 {
+    
     public class MovieController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -30,6 +32,7 @@ namespace Cinemax.Controllers
 
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         //post method to create a movie 
         public IActionResult Create([Bind("MovieId,MovieTitle,Director,ReleaseYear,Duration,GenreId")] Movie movie)
         {
@@ -65,6 +68,7 @@ namespace Cinemax.Controllers
             return View(movie);
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         //post method to edit a movie
         public IActionResult Edit(int id, [Bind("MovieId,MovieTitle,Director,ReleaseYear,Duration,GenreId")] Movie movie)
         {
