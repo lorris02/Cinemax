@@ -7,11 +7,23 @@
 <h1>Explore Our Movie Collections</h1>
 <p>
     Use the movie list below to explore your favorite directors, compare release dates,
-    or check out recent films added to our collection. Stay tuned, we’re always adding more classics and new releases,and also if you will like to <a asp-action="Create">add a Movie</a>,pls feel free
+    or check out recent films added to our collection. Stay tuned, we’re always adding more classics and new releases,and also if you will like to add a Movie,pls feel free
 </p>
 
 <p>
-    <a asp-action="Create">Add a New Movie</a>
+	@if (User.Identity.IsAuthenticated)//check if user is logged in
+    {
+        <a asp-action="Create">Add a New Movie</a>
+    }
+    else
+	{
+		//i asked ai this,so it redirects the user back to the exact place after login
+		//i kmew the area was the identity but i was not sure about the rest
+        <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Create", "Movies")" class="btn btn-primary">
+            Login to add a movie
+        </a>
+
+    }
 </p>
 <table class="table">
     <thead>
@@ -59,8 +71,13 @@
                 @Html.DisplayFor(modelItem => item.DurationFormatted)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.MovieId">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@item.MovieId" onclick="return confirmDelete();">Delete</a>
+                  @if (User.Identity.IsAuthenticated)
+                {
+                 <text>
+                  <a asp-action="Edit" asp-route-id="@item.MovieId">Edit</a> |
+                  <a asp-action="Delete" asp-route-id="@item.MovieId" onclick="return confirmDelete();">Delete</a>
+                  </text>
+                    }
             </td>
         </tr>
 }

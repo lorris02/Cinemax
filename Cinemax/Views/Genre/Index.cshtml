@@ -4,13 +4,19 @@
     ViewData["Title"] = "Index";
 }
 
-<h1></h1>
+<h1>Movie Genres</h1>
+<p>Browse through our movie genres and discover films that match your mood. Each genre offers a unique cinematic experience.</p>
 
-<!--
+
 <p>
-    <a asp-action="Create">Create New</a>
+	@if (User.IsInRole("Administrator")) //i added this to restrict access to only admin,cuz i want only admins to be albe to edit anything concenring genres
+    {
+        <text>
+            <a asp-action="Create">Create New</a>
+        </text>
+    }
 </p>
--->
+
 <table class="table">
     <thead>
         <tr>
@@ -38,16 +44,22 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.GenreId)
                 </td>
-                
-            <!--
-					commented this,so users cannot edit or delete genres,since we havent added conditions for if a user/admin is logged in
+
+	        
             <td>
+					@if (User.IsInRole("Administrator"))//i addded this to restrict access to only admin,cuz i want only admins to be albe to edit anythiing concerning the genres
+                 {
+                 <text>
                 <a asp-action="Edit" asp-route-id="@item.GenreId">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.GenreId">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.GenreId">Delete</a>
+                </text>
+                 }
             </td>
-            -->
         </tr>
 }
     </tbody>
 </table>
+<p>
+    Now that you've picked a genre, check out movies that suit your taste<a asp-controller="Movie" asp-action="Index"> here</a>.
+</p>
