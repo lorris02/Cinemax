@@ -21,13 +21,13 @@ namespace Cinemax.Controllers
         public IActionResult Index()
         {
             var movies = _context.Movies.Include(m => m.Genre).ToList();
-            return View(movies);
+            return View("Index",movies);
         }
         //create method to return the create view
         public IActionResult Create()
         {
             ViewBag.GenreId = new SelectList(_context.Genres.ToList(), "GenreId", "Name");
-            return View();
+            return View("Create");
         }
 
 
@@ -42,7 +42,7 @@ namespace Cinemax.Controllers
             {
                 ViewBag.GenreId = new SelectList(_context.Genres.ToList(), "GenreId", "Name"); 
 
-                return View();
+                return View("Create",movie);
             }
 
             //adds the movie to the db
@@ -65,7 +65,7 @@ namespace Cinemax.Controllers
             }
             ViewBag.GenreId = new SelectList(_context.Genres.ToList(), "GenreId", "Name");
             //return the movie to the view
-            return View(movie);
+            return View("Edit",movie);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -76,7 +76,7 @@ namespace Cinemax.Controllers
             if (!ModelState.IsValid)
             {
                 ViewBag.GenreId = new SelectList(_context.Genres.ToList(), "GenreId","Name");
-                return View();
+                return View("Edit",movie);
             }
 
             //update movie in the db
