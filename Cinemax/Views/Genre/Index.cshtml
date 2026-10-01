@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Cinemax.Models.Genre>
+@model IEnumerable<Cinemax.Models.Genre>
 
 @{
     ViewData["Title"] = "Index";
@@ -51,8 +51,9 @@
                  {
                  <text>
                 <a asp-action="Edit" asp-route-id="@item.GenreId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.GenreId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.GenreId">Delete</a>
+                <form asp-action="Delete" asp-route-id="@item.GenreId" method="post" class="d-inline" onsubmit="return confirm('Delete this genre?');">
+                      <button type="submit" class="btn btn-link p-0 text-danger">Delete</button>
+                  </form>
                 </text>
                  }
             </td>
