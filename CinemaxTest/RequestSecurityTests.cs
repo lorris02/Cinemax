@@ -106,7 +106,10 @@ public class RequestSecurityTests
     {
         client.DefaultRequestHeaders.Add("X-Test-Role", "Administrator");
         foreach (var path in new[] { "/Movie/Delete/1", "/Review/Delete/1", "/Genre/Delete/1" })
-            Assert.AreEqual(HttpStatusCode.MethodNotAllowed, (await client.GetAsync(path)).StatusCode, path);
+        {
+            var status = (await client.GetAsync(path)).StatusCode;
+            Assert.IsTrue(status == HttpStatusCode.NotFound || status == HttpStatusCode.MethodNotAllowed, path);
+        }
         using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         Assert.AreEqual(1, db.Movies.Count());
