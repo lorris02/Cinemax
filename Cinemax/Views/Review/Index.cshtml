@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Cinemax.Models.Review>
+@model IEnumerable<Cinemax.Models.Review>
 
 @{
     ViewData["Title"] = "Reviews";
@@ -60,11 +60,13 @@
                 @Html.DisplayFor(modelItem => item.MovieId)
             </td>
             <td>
-					@if (User.Identity.IsAuthenticated) //check if user is logged in
+					@if (User.IsInRole("Administrator")) //check if user is logged in
                  {
                   <text>
                   <a asp-action="Edit" asp-route-id="@item.ReviewId">Edit</a> |
-                  <a asp-action="Delete" asp-route-id="@item.ReviewId" onclick="return confirmDelete();">Delete</a>
+                  <form asp-action="Delete" asp-route-id="@item.ReviewId" method="post" class="d-inline" onsubmit="return confirm('Delete this review?');">
+                      <button type="submit" class="btn btn-link p-0 text-danger">Delete</button>
+                  </form>
                   </text>
                  }
               </td>
@@ -83,7 +85,7 @@
     {
        //i asked ai this,so it redirects the user back to the exact place after login
       //i knew the area was the identity but i was not sure about the rest
-    <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Create", "Reviews")" class="btn btn-primary">
+    <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Create", "Review")" class="btn btn-primary">
         Login to add your review
     </a>
 

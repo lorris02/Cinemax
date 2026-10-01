@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Cinemax.Models.Movie>
+@model IEnumerable<Cinemax.Models.Movie>
 
 
 @{
@@ -19,7 +19,7 @@
 	{
 		//i asked ai this,so it redirects the user back to the exact place after login
 		//i kmew the area was the identity but i was not sure about the rest
-        <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Create", "Movies")" class="btn btn-primary">
+        <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Create", "Movie")" class="btn btn-primary">
             Login to add a movie
         </a>
 
@@ -71,11 +71,13 @@
                 @Html.DisplayFor(modelItem => item.DurationFormatted)
             </td>
             <td>
-                  @if (User.Identity.IsAuthenticated)
+                  @if (User.IsInRole("Administrator"))
                 {
                  <text>
                   <a asp-action="Edit" asp-route-id="@item.MovieId">Edit</a> |
-                  <a asp-action="Delete" asp-route-id="@item.MovieId" onclick="return confirmDelete();">Delete</a>
+                  <form asp-action="Delete" asp-route-id="@item.MovieId" method="post" class="d-inline" onsubmit="return confirm('Delete this movie?');">
+                      <button type="submit" class="btn btn-link p-0 text-danger">Delete</button>
+                  </form>
                   </text>
                     }
             </td>

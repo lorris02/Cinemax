@@ -15,19 +15,20 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
-//enable google auth
-var configuration = builder.Configuration;
-builder.Services.AddAuthentication()
-    .AddGoogle(options =>
-    {
-        options.ClientId = configuration["Authentication:Google:ClientId"];
-        options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
-    })
-    .AddGitHub(options =>
-    {
-        options.ClientId = configuration["Authentication:GitHub:ClientId"];
-        options.ClientSecret = configuration["Authentication:GitHub:ClientSecret"];
-    });
+// Optional providers are enabled only when both credentials are configured.
+var authentication = builder.Services.AddAuthentication();
+var googleId = builder.Configuration["Authentication:Google:ClientId"];
+var googleSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+if (!string.IsNullOrWhiteSpace(googleId) && !string.IsNullOrWhiteSpace(googleSecret))
+{
+    authentication.AddGoogle(options => { options.ClientId = googleId; options.ClientSecret = googleSecret; });
+}
+var githubId = builder.Configuration["Authentication:GitHub:ClientId"];
+var githubSecret = builder.Configuration["Authentication:GitHub:ClientSecret"];
+if (!string.IsNullOrWhiteSpace(githubId) && !string.IsNullOrWhiteSpace(githubSecret))
+{
+    authentication.AddGitHub(options => { options.ClientId = githubId; options.ClientSecret = githubSecret; });
+}
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -45,6 +46,7 @@ else
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
@@ -58,3 +60,5 @@ app.MapRazorPages()
    .WithStaticAssets();
 
 app.Run();
+
+public partial class Program { }
