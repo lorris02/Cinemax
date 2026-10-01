@@ -1,35 +1,27 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cinemax.Models
 {
-    public class Movie
+    public class Movie : IValidatableObject
     {
         public int MovieId { get; set; }
+        [Required, StringLength(200)]
         public string? MovieTitle { get; set; }
+        [Required, StringLength(150)]
         public string? Director { get; set; }
-
-        [Range(1980,2024, ErrorMessage = "Please we don't accept movies with a Releaseyear before 1980 and after 2024")]
         public int ReleaseYear { get; set; }
-        
+        [Range(1, 1440)]
         public int Duration { get; set; }
-
-        //Added a notmapped property to make it read only so i format the duration in hours and minutes
-        [NotMapped] 
-        public string DurationFormatted
-        {
-            get
-            {
-                return $"{Duration / 60}h {Duration % 60}m";
-            }
-        }
-
-        //Genre foreign key, one genre can have many movies
+        [NotMapped]
+        public string DurationFormatted => $"{Duration / 60}h {Duration % 60}m";
+        [Range(1, int.MaxValue)]
         public int GenreId { get; set; }
-        //navigation property
         public Genre? Genre { get; set; }
-
-        List<Review> Review { get; set; } = new();
-
+        public IEnumerable<ValidationResult> Validate(ValidationContext context)
+        {
+            if (ReleaseYear < 1888 || ReleaseYear > DateTime.UtcNow.Year + 2)
+                yield return new ValidationResult("Choose a release year from 1888 through the next two years.", new[] { nameof(ReleaseYear) });
+        }
     }
 }
