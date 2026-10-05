@@ -29,7 +29,6 @@ namespace Cinemax.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
-        private object await_userManager;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
@@ -123,7 +122,6 @@ namespace Cinemax.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    await _userManager.AddToRoleAsync(user, "Customer");  //auto assign every new registered user the role of Customer
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

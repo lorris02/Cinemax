@@ -1,4 +1,4 @@
-﻿using Cinemax.Data;
+using Cinemax.Data;
 using Cinemax.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -46,6 +46,9 @@ namespace Cinemax.Controllers
 
         public IActionResult Create([Bind("ReviewerName,ReviewMessage,ReviewId,Rating,MovieId")] Review review)
         {
+            review.ReviewId = 0;
+            if (!_context.Movies.Any(m => m.MovieId == review.MovieId))
+                ModelState.AddModelError(nameof(review.MovieId), "Choose an existing movie.");
             // validate inputs
             if (!ModelState.IsValid)
             {
@@ -61,7 +64,7 @@ namespace Cinemax.Controllers
         }
 
         //get method to return a populated form for the edit view
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
         public IActionResult Edit(int id)
         {
             var review = _context.Reviews.Find(id);
@@ -80,11 +83,16 @@ namespace Cinemax.Controllers
 
 
         //post method to save the edited review
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, [Bind("ReviewerName,ReviewMessage,ReviewId,Rating,MovieId")] Review review)
         {
+            if (id != review.ReviewId) return BadRequest();
+            var existing = _context.Reviews.Find(id);
+            if (existing == null) return NotFound();
+            if (!_context.Movies.Any(m => m.MovieId == review.MovieId))
+                ModelState.AddModelError(nameof(review.MovieId), "Choose an existing movie.");
             // validate the input
             if (!ModelState.IsValid)
             {
@@ -96,13 +104,18 @@ namespace Cinemax.Controllers
             }
 
             // save and redirect to index
-            _context.Reviews.Update(review);
+            existing.ReviewerName = review.ReviewerName;
+            existing.ReviewMessage = review.ReviewMessage;
+            existing.Rating = review.Rating;
+            existing.MovieId = review.MovieId;
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
 
         //get method to confirm deletion of a review
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
             var review = _context.Reviews.Find(id);

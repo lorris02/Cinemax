@@ -1,4 +1,4 @@
-﻿using Cinemax.Data;
+using Cinemax.Data;
 using Cinemax.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +24,7 @@ namespace Cinemax.Controllers
             return View("Index",movies);
         }
         //create method to return the create view
+        [Authorize]
         public IActionResult Create()
         {
             ViewBag.GenreId = new SelectList(_context.Genres.ToList(), "GenreId", "Name");
@@ -31,12 +32,16 @@ namespace Cinemax.Controllers
         }
 
 
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         //post method to create a movie 
         public IActionResult Create([Bind("MovieId,MovieTitle,Director,ReleaseYear,Duration,GenreId")] Movie movie)
         {
             
+            if (!_context.Genres.Any(g => g.GenreId == movie.GenreId))
+                ModelState.AddModelError(nameof(movie.GenreId), "Choose an existing genre.");
+            movie.MovieId = 0;
             //checks if the input is valid
             if (!ModelState.IsValid)
             {
@@ -53,6 +58,7 @@ namespace Cinemax.Controllers
             return RedirectToAction("Index");
         }
         //get method to edit a movie
+        [Authorize(Roles = "Administrator")]
         public IActionResult Edit(int id)
         {
             //create a variable to hold the movie and find it by id
@@ -67,11 +73,17 @@ namespace Cinemax.Controllers
             //return the movie to the view
             return View("Edit",movie);
         }
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         //post method to edit a movie
         public IActionResult Edit(int id, [Bind("MovieId,MovieTitle,Director,ReleaseYear,Duration,GenreId")] Movie movie)
         {
+            if (id != movie.MovieId) return BadRequest();
+            var existing = _context.Movies.Find(id);
+            if (existing == null) return NotFound();
+            if (!_context.Genres.Any(g => g.GenreId == movie.GenreId))
+                ModelState.AddModelError(nameof(movie.GenreId), "Choose an existing genre.");
             // validate the input of the user
             if (!ModelState.IsValid)
             {
@@ -80,7 +92,11 @@ namespace Cinemax.Controllers
             }
 
             //update movie in the db
-            _context.Movies.Update(movie);
+            existing.MovieTitle = movie.MovieTitle;
+            existing.Director = movie.Director;
+            existing.ReleaseYear = movie.ReleaseYear;
+            existing.Duration = movie.Duration;
+            existing.GenreId = movie.GenreId;
             _context.SaveChanges();
 
             // redirect to list on the Index
@@ -88,6 +104,9 @@ namespace Cinemax.Controllers
 
         }
         //get method to delete a movie
+        [Authorize(Roles = "Administrator")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
             var movie = _context.Movies.Find(id);

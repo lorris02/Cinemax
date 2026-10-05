@@ -1,5 +1,6 @@
-﻿using Cinemax.Data;
+using Cinemax.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Cinemax.Controllers
 {  //i added the edit and delete methods before i creates genres just incase i need to edit them later,but afterwards i'm going to make the genres fixed and they cant be edited or created
@@ -19,6 +20,7 @@ namespace Cinemax.Controllers
             return View(genres);
         }
         //Get method to return the create view
+        [Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
             if (!ModelState.IsValid)
@@ -28,6 +30,7 @@ namespace Cinemax.Controllers
             return View();
         }
         //post method to create a genre
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create([Bind("Name,Description")] Models.Genre genre)
@@ -41,6 +44,7 @@ namespace Cinemax.Controllers
             return RedirectToAction("Index");
         }
         //get method to edit a genre
+        [Authorize(Roles = "Administrator")]
         public IActionResult Edit(int id)
         {
             var genre = _context.Genres.Find(id);
@@ -51,19 +55,27 @@ namespace Cinemax.Controllers
             return View(genre);
         }
         //post method to edit a genre
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([Bind("GenreId,Name,Description")] Models.Genre genre)
+        public IActionResult Edit(int id, [Bind("GenreId,Name,Description")] Models.Genre genre)
         {
+            if (id != genre.GenreId) return BadRequest();
+            var existing = _context.Genres.Find(id);
+            if (existing == null) return NotFound();
             if (!ModelState.IsValid)
             {
                 return View(genre);
             }
-            _context.Genres.Update(genre);
+            existing.Name = genre.Name;
+            existing.Description = genre.Description;
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
-        //delete method to delete a genre
+        // Genres in use must remain available to their movies.
+        [Authorize(Roles = "Administrator")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
             var genre = _context.Genres.Find(id);
@@ -71,7 +83,10 @@ namespace Cinemax.Controllers
             {
                 return NotFound();
             }
-            return View(genre);
+            if (_context.Movies.Any(m => m.GenreId == id)) return Conflict("This genre is used by a movie.");
+            _context.Genres.Remove(genre);
+            _context.SaveChanges();
+            return RedirectToAction("Index");
         }
     }
 }
