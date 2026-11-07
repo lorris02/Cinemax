@@ -72,6 +72,15 @@ public class MovieControllerTests
     }
 
     [TestMethod]
+    public void SearchIgnoresUpperAndLowerCase()
+    {
+        var title = _context.Movies.First().MovieTitle!;
+        var result = (ViewResult)_controller.Index(title.ToUpper());
+        var movies = (IEnumerable<Movie>)result.Model!;
+        Assert.IsTrue(movies.Any(m => m.MovieTitle == title));
+    }
+
+    [TestMethod]
     //method to test Index method
     public void IndexReturnsView()
     {

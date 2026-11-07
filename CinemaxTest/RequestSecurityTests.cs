@@ -43,7 +43,8 @@ public class CinemaxFactory : WebApplicationFactory<Program>
         builder.UseEnvironment("Development");
         builder.ConfigureAppConfiguration((context, configuration) =>
             configuration.AddInMemoryCollection(new Dictionary<string, string?> {
-                ["ConnectionStrings:DefaultConnection"] = "Data Source=unused.db"
+                ["ConnectionStrings:DefaultConnection"] = "Data Source=unused.db",
+                ["Tmdb:ApiKey"] = ""
             }));
         builder.ConfigureServices(services => {
             services.RemoveAll<DbContextOptions<ApplicationDbContext>>();
@@ -92,6 +93,22 @@ public class RequestSecurityTests
         foreach (var path in new[] { "/Movie/Create", "/Movie/Edit/1", "/Review/Create", "/Review/Edit/1", "/Genre/Create", "/Genre/Edit/1" })
             Assert.AreEqual(HttpStatusCode.Unauthorized, (await client.GetAsync(path)).StatusCode, path);
     }
+    [TestMethod]
+    public async Task VisitorsCanOpenHomeAndMovieDetails()
+    {
+        foreach (var path in new[] { "/", "/Movie/Details/1", "/Movie?q=m", "/Movie?genreId=1" })
+            Assert.AreEqual(HttpStatusCode.OK, (await client.GetAsync(path)).StatusCode, path);
+        Assert.AreEqual(HttpStatusCode.NotFound, (await client.GetAsync("/Movie/Details/999")).StatusCode);
+    }
+
+    [TestMethod]
+    public async Task OnlyAdminCanOpenTmdbImport()
+    {
+        Assert.AreEqual(HttpStatusCode.Unauthorized, (await client.GetAsync("/MovieImport")).StatusCode);
+        client.DefaultRequestHeaders.Add("X-Test-Role", "Customer");
+        Assert.AreEqual(HttpStatusCode.Forbidden, (await client.GetAsync("/MovieImport")).StatusCode);
+    }
+
     [TestMethod]
     public async Task CustomerCannotModerateCatalogueOrReviews()
     {

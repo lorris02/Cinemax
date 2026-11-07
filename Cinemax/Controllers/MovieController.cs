@@ -18,11 +18,34 @@ namespace Cinemax.Controllers
         }
 
         //displays all data for the index view
-        public IActionResult Index()
+        public IActionResult Index(string? q = null, int? genreId = null)
         {
-            var movies = _context.Movies.Include(m => m.Genre).ToList();
-            return View("Index",movies);
+            var query = _context.Movies.Include(m => m.Genre).Include(m => m.Reviews).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                var term = q.Trim().ToLower();
+                query = query.Where(m => m.MovieTitle!.ToLower().Contains(term) || m.Director!.ToLower().Contains(term));
+            }
+            if (genreId.HasValue)
+            {
+                query = query.Where(m => m.GenreId == genreId);
+            }
+            ViewBag.Query = q;
+            ViewBag.GenreId = genreId;
+            ViewBag.Genres = _context.Genres.OrderBy(g => g.Name).ToList();
+            return View("Index", query.OrderBy(m => m.MovieId).ToList());
         }
+
+        public IActionResult Details(int id)
+        {
+            var movie = _context.Movies.Include(m => m.Genre).Include(m => m.Reviews).FirstOrDefault(m => m.MovieId == id);
+            if (movie == null)
+            {
+                return NotFound();
+            }
+            return View("Details", movie);
+        }
+
         //create method to return the create view
         [Authorize]
         public IActionResult Create()
