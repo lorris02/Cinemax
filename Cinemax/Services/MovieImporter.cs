@@ -22,6 +22,16 @@ namespace Cinemax.Services
             _tmdb = tmdb;
         }
 
+        public Task<Movie?> FindAsync(int tmdbId) =>
+            _context.Movies.FirstOrDefaultAsync(m => m.TmdbId == tmdbId);
+
+        public Task<Dictionary<int, int>> KnownAsync(IEnumerable<int> tmdbIds)
+        {
+            var ids = tmdbIds.ToList();
+            return _context.Movies.Where(m => m.TmdbId != null && ids.Contains(m.TmdbId.Value))
+                .ToDictionaryAsync(m => m.TmdbId!.Value, m => m.MovieId);
+        }
+
         // Returns null when TMDB lacks what the catalogue needs, such as a title or release year.
         public async Task<Movie?> ImportAsync(int tmdbId)
         {

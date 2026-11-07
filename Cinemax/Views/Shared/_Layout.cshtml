@@ -41,12 +41,18 @@
         </nav>
     </header>
     <main role="main">
-        @if (TempData["Notice"] is string notice)
-        {
-            <p class="notice" role="status">@notice</p>
-        }
         @RenderBody()
     </main>
+    <div class="toast-stack" aria-live="polite">
+        @if (TempData["Success"] is string success)
+        {
+            <div class="toast-note success" role="status"><span class="toast-icon" aria-hidden="true">&#10003;</span><span>@success</span><button type="button" class="toast-close" aria-label="Dismiss">&times;</button></div>
+        }
+        @if (TempData["Notice"] is string notice)
+        {
+            <div class="toast-note warning" role="status"><span class="toast-icon" aria-hidden="true">!</span><span>@notice</span><button type="button" class="toast-close" aria-label="Dismiss">&times;</button></div>
+        }
+    </div>
     <form id="open-tmdb" method="post" asp-area="" asp-controller="Search" asp-action="Open" hidden>
         <input type="hidden" name="tmdbId" />
     </form>

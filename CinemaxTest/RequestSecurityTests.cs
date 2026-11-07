@@ -214,7 +214,7 @@ public class RequestSecurityTests
         client.DefaultRequestHeaders.Add("X-Test-Role", "Administrator");
         var token = await Token("/Genre");
         var response = await client.PostAsync("/Genre/Delete/1", new FormUrlEncodedContent(new Dictionary<string, string> { ["__RequestVerificationToken"] = token }));
-        Assert.AreEqual(HttpStatusCode.Conflict, response.StatusCode);
+        Assert.AreEqual(HttpStatusCode.Redirect, response.StatusCode);
         using var scope = factory.Services.CreateScope();
         Assert.AreEqual(1, scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Genres.Count());
     }

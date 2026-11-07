@@ -24,25 +24,34 @@ namespace Cinemax.Controllers
             try
             {
                 var results = string.IsNullOrWhiteSpace(q) ? await _tmdb.PopularAsync() : await _tmdb.SearchAsync(q.Trim());
+                ViewBag.Known = await _importer.KnownAsync(results.Select(m => m.Id));
                 return View(results);
             }
             catch (Exception e) when (e is HttpRequestException or TaskCanceledException)
             {
                 ViewBag.Error = "TMDB could not be reached. Please try again.";
+                ViewBag.Known = new Dictionary<int, int>();
                 return View(Array.Empty<TmdbMovieSummary>());
             }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(int tmdbId)
+        public async Task<IActionResult> Add(int tmdbId, string? q = null)
         {
             try
             {
+                var known = await _importer.FindAsync(tmdbId);
+                if (known != null)
+                {
+                    TempData["Notice"] = $"{known.MovieTitle} is already in Cinemax.";
+                    return RedirectToAction("Index", new { q });
+                }
                 var movie = await _importer.ImportAsync(tmdbId);
                 if (movie != null)
                 {
-                    return RedirectToAction("Details", "Movie", new { id = movie.MovieId });
+                    TempData["Success"] = $"{movie.MovieTitle} was added to Cinemax.";
+                    return RedirectToAction("Index", new { q });
                 }
                 TempData["ImportError"] = "That movie is missing details Cinemax needs, such as a release year.";
             }
@@ -50,7 +59,7 @@ namespace Cinemax.Controllers
             {
                 TempData["ImportError"] = "TMDB could not be reached. Please try again.";
             }
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { q });
         }
     }
 }
