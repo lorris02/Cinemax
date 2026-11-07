@@ -63,7 +63,7 @@ namespace Cinemax.Services
                     {
                         break;
                     }
-                    if (await ImportAsync(item.Id) != null)
+                    if (!await _context.Movies.AnyAsync(m => m.TmdbId == item.Id) && await ImportAsync(item.Id) != null)
                     {
                         added++;
                     }
