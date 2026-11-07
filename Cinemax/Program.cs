@@ -3,6 +3,7 @@ using System.Threading.RateLimiting;
 using Cinemax.Services;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +14,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
+// New accounts confirm their email before signing in. Accounts from before this change were marked confirmed by a migration.
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()// enables role management
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
@@ -24,6 +26,7 @@ builder.Services.AddHttpClient<ITmdbClient, TmdbClient>(client =>
     client.BaseAddress = new Uri("https://api.themoviedb.org/3/");
     client.Timeout = TimeSpan.FromSeconds(15);
 }).RemoveAllLoggers();
+builder.Services.AddHttpClient<IEmailSender, ResendEmailSender>(client => client.Timeout = TimeSpan.FromSeconds(10));
 builder.Services.AddScoped<MovieImporter>();
 builder.Services.AddScoped<MovieSearch>();
 builder.Services.AddMemoryCache(options => options.SizeLimit = 500);
@@ -33,6 +36,12 @@ builder.Services.AddRateLimiter(options =>
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
     options.AddPolicy("search", context => PerAddress(context, 90));
     options.AddPolicy("import", context => PerAddress(context, 15));
+    // Pages that send email are limited so nobody can use them to flood an inbox.
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+        HttpMethods.IsPost(context.Request.Method) && SendsEmail(context.Request.Path)
+            ? RateLimitPartition.GetFixedWindowLimiter("email:" + (context.Connection.RemoteIpAddress?.ToString() ?? "unknown"),
+                _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(10) })
+            : RateLimitPartition.GetNoLimiter("none"));
 });
 
 // Optional providers are enabled only when both credentials are configured.
@@ -94,5 +103,9 @@ app.Run();
 static RateLimitPartition<string> PerAddress(HttpContext context, int perMinute) =>
     RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = perMinute, Window = TimeSpan.FromMinutes(1) });
+
+static bool SendsEmail(PathString path) =>
+    new[] { "/Identity/Account/Register", "/Identity/Account/ForgotPassword", "/Identity/Account/ResendEmailConfirmation" }
+        .Any(page => path.Equals(page, StringComparison.OrdinalIgnoreCase));
 
 public partial class Program { }

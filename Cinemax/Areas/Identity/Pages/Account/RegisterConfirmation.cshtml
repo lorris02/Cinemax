@@ -1,0 +1,15 @@
+@page
+@model Microsoft.AspNetCore.Identity.UI.V5.Pages.Account.Internal.RegisterConfirmationModel
+@{
+    ViewData["Title"] = "Check your email";
+}
+
+<div class="account-form">
+    <h1>Check your email</h1>
+    <div class="form-card account-note">
+        <p>We sent a confirmation link to <strong>@Model.Email</strong>. Open it to finish creating your account.</p>
+        <p class="muted-note">It can take a minute. Check your spam folder too.</p>
+        <a class="w-100 btn btn-outline-light" asp-page="./ResendEmailConfirmation">Send the link again</a>
+    </div>
+    <p class="account-switch">Confirmed already? <a asp-page="./Login">Log in</a></p>
+</div>

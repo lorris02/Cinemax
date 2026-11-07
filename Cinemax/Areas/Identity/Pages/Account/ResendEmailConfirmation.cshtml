@@ -1,0 +1,28 @@
+@page
+@model ResendEmailConfirmationModel
+@{
+    ViewData["Title"] = "Resend confirmation";
+}
+
+<div class="account-form">
+    <h1>Resend confirmation</h1>
+    @if (Model.Sent)
+    {
+        <p class="form-status" role="status">If that email needs confirming, a new link is on its way. Check your spam folder too.</p>
+    }
+    <form method="post" class="form-card">
+        <p class="muted-note">Enter the email you signed up with.</p>
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        <div class="form-floating mb-3">
+            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+            <label asp-for="Input.Email" class="form-label">Email</label>
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+        <button type="submit" class="w-100 btn btn-lg btn-primary">Send link</button>
+    </form>
+    <p class="account-switch"><a asp-page="./Login">Back to log in</a></p>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

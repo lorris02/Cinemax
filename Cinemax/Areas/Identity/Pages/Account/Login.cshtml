@@ -1,5 +1,4 @@
 @page
-@using Microsoft.AspNetCore.Identity.UI.V5.Pages.Account.Internal
 @model LoginModel
 @{
     ViewData["Title"] = "Log in";
@@ -7,8 +6,16 @@
 
 <div class="account-form">
     <h1>@ViewData["Title"]</h1>
+    @if (!string.IsNullOrEmpty(Model.StatusMessage))
+    {
+        <p class="form-status" role="status">@Model.StatusMessage</p>
+    }
     <form id="account" method="post" class="form-card">
         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        @if (Model.NeedsConfirmation)
+        {
+            <p class="form-aside"><a asp-page="./ResendEmailConfirmation">Send the confirmation link again</a></p>
+        }
         <div class="form-floating mb-3">
             <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
             <label asp-for="Input.Email" class="form-label">Email</label>
@@ -19,11 +26,14 @@
             <label asp-for="Input.Password" class="form-label">Password</label>
             <span asp-validation-for="Input.Password" class="text-danger"></span>
         </div>
-        <div class="checkbox mb-3">
+        <div class="login-row">
+        <div class="checkbox">
             <label asp-for="Input.RememberMe" class="form-label">
                 <input class="form-check-input" asp-for="Input.RememberMe" />
                 Remember me
             </label>
+        </div>
+        <a asp-page="./ForgotPassword">Forgot password?</a>
         </div>
         <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
     </form>
