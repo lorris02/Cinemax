@@ -43,7 +43,7 @@ public class CinemaxFactory : WebApplicationFactory<Program>
         builder.UseEnvironment("Development");
         builder.ConfigureAppConfiguration((context, configuration) =>
             configuration.AddInMemoryCollection(new Dictionary<string, string?> {
-                ["ConnectionStrings:DefaultConnection"] = "Server=unused;Database=unused;Integrated Security=true"
+                ["ConnectionStrings:DefaultConnection"] = "Data Source=unused.db"
             }));
         builder.ConfigureServices(services => {
             services.RemoveAll<DbContextOptions<ApplicationDbContext>>();
