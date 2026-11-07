@@ -2,56 +2,41 @@
 
 @{
     ViewData["Title"] = "Genres";
+    var covers = (Dictionary<int, (string? Backdrop, int Count)>)ViewBag.Covers;
+    var isAdmin = User.IsInRole("Administrator");
 }
 
 <div class="page">
-<h1>Genres</h1>
-<p class="lead-text">Pick a genre to see the movies in it.</p>
+    <div class="section-head page-head">
+        <div>
+            <h1>Genres</h1>
+            <p class="lead-text">Pick a mood and start browsing</p>
+        </div>
+        @if (isAdmin)
+        {
+            <a class="btn btn-primary btn-sm" asp-action="Create">Add genre</a>
+        }
+    </div>
 
-
-<p>
-	@if (User.IsInRole("Administrator")) //i added this to restrict access to only admin,cuz i want only admins to be albe to edit anything concenring genres
-    {
-        <text>
-            <a asp-action="Create">Create New</a>
-        </text>
-    }
-</p>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Genre
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                <a asp-controller="Movie" asp-action="Index" asp-route-genreId="@item.GenreId">@item.Name</a>
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-					@if (User.IsInRole("Administrator"))//i addded this to restrict access to only admin,cuz i want only admins to be albe to edit anythiing concerning the genres
-                 {
-                 <text>
-                <a asp-action="Edit" asp-route-id="@item.GenreId">Edit</a> |
-                <form asp-action="Delete" asp-route-id="@item.GenreId" method="post" class="d-inline" onsubmit="return confirm('Delete this genre?');">
-                      <button type="submit" class="btn btn-link p-0 text-danger">Delete</button>
-                  </form>
-                </text>
-                 }
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="genre-grid">
+        @foreach (var item in Model)
+        {
+            var cover = covers.GetValueOrDefault(item.GenreId);
+            <div>
+                <a class="genre-tile" asp-controller="Movie" asp-action="Index" asp-route-genreId="@item.GenreId" style="--hero-image: url('@cover.Backdrop')">
+                    <strong>@item.Name</strong>
+                    <small>@cover.Count @(cover.Count == 1 ? "movie" : "movies")</small>
+                </a>
+                @if (isAdmin)
+                {
+                    <div class="admin-row">
+                        <a class="btn btn-ghost btn-sm" asp-action="Edit" asp-route-id="@item.GenreId">Edit</a>
+                        <form asp-action="Delete" asp-route-id="@item.GenreId" method="post" onsubmit="return confirm('Delete this genre?');">
+                            <button type="submit" class="btn btn-danger-soft btn-sm">Delete</button>
+                        </form>
+                    </div>
+                }
+            </div>
+        }
+    </div>
 </div>

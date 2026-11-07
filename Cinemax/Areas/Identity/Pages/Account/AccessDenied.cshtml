@@ -1,0 +1,16 @@
+@page
+@using Microsoft.AspNetCore.Identity.UI.V5.Pages.Account.Internal
+@model AccessDeniedModel
+@{
+    ViewData["Title"] = "Access denied";
+}
+
+<div class="state-page">
+    <p class="state-code">Oops</p>
+    <h1>This page is for admins</h1>
+    <p class="lead-text">Your account doesn't have access to this page.</p>
+    <div class="hero-actions">
+        <a class="btn btn-primary" asp-area="" asp-controller="Movie" asp-action="Index">Browse movies</a>
+        <a class="btn btn-ghost" asp-area="" asp-controller="Home" asp-action="Index">Go home</a>
+    </div>
+</div>

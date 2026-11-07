@@ -6,7 +6,7 @@
 
 <div class="account-form">
     <h1>Create an account</h1>
-    <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+    <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-card">
         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
         <div class="form-floating mb-3">
             <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />

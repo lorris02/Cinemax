@@ -1,0 +1,13 @@
+@model Cinemax.Models.Genre
+
+<div asp-validation-summary="ModelOnly" class="form-error"></div>
+<div class="field">
+    <label asp-for="Name">Genre name</label>
+    <input asp-for="Name" class="form-control" placeholder="e.g. Science Fiction" />
+    <span asp-validation-for="Name" class="field-error"></span>
+</div>
+<div class="field">
+    <label asp-for="Description">Description <span class="optional">Optional</span></label>
+    <textarea asp-for="Description" class="form-control" rows="3" placeholder="A short note about this genre"></textarea>
+    <span asp-validation-for="Description" class="field-error"></span>
+</div>
