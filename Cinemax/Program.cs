@@ -1,5 +1,6 @@
 using Cinemax.Data;
 using Cinemax.Services;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,6 +42,12 @@ if (!string.IsNullOrWhiteSpace(githubId) && !string.IsNullOrWhiteSpace(githubSec
 var app = builder.Build();
 
 await DatabaseSetup.RunAsync(app.Services, app.Configuration);
+
+// Nginx ends HTTPS and passes the original scheme and visitor address.
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
