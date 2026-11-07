@@ -102,6 +102,17 @@ public class RequestSecurityTests
     }
 
     [TestMethod]
+    public async Task AccountPagesHideSetupNotesAndUnusedEmailLinks()
+    {
+        foreach (var path in new[] { "/Identity/Account/Login", "/Identity/Account/Register" })
+        {
+            var page = await client.GetStringAsync(path);
+            foreach (var hidden in new[] { "external authentication services", "ForgotPassword", "ResendEmailConfirmation" })
+                Assert.IsFalse(page.Contains(hidden), $"{path} shows {hidden}");
+        }
+    }
+
+    [TestMethod]
     public async Task OnlyAdminCanOpenTmdbImport()
     {
         Assert.AreEqual(HttpStatusCode.Unauthorized, (await client.GetAsync("/MovieImport")).StatusCode);
