@@ -130,4 +130,16 @@ public class TmdbTests
         Assert.AreEqual(2, await new MovieImporter(db, tmdb).ImportPopularAsync(2));
         Assert.AreEqual(2, db.Movies.Count());
     }
+
+    [TestMethod]
+    public async Task PopularImportDoesNotCountMoviesAlreadyInTheCatalogue()
+    {
+        using var db = Database();
+        var tmdb = new FakeTmdb();
+        foreach (var id in new[] { 1, 2, 3 }) tmdb.Movies[id] = Sample(id);
+        var importer = new MovieImporter(db, tmdb);
+        await importer.ImportAsync(1);
+        Assert.AreEqual(2, await importer.ImportPopularAsync(2));
+        Assert.AreEqual(3, db.Movies.Count());
+    }
 }
