@@ -12,7 +12,7 @@ An ASP.NET Core movie catalogue with genres, ratings, and viewer reviews.
 
 ## Run locally
 
-Requires .NET 9 and SQL Server. Configure `ConnectionStrings:DefaultConnection` with .NET user secrets or the `ConnectionStrings__DefaultConnection` environment variable, then apply the existing Entity Framework migrations.
+Requires .NET 9. Cinemax uses SQLite and creates `cinemax.db` the first time it runs. To store it somewhere else, set `ConnectionStrings__DefaultConnection`.
 
 ```sh
 dotnet run --project Cinemax
@@ -21,4 +21,4 @@ dotnet test Cinemax.sln
 
 Google and GitHub sign-in are optional. Configure their client IDs and secrets using `Authentication__Google__ClientId`, `Authentication__Google__ClientSecret`, `Authentication__GitHub__ClientId`, and `Authentication__GitHub__ClientSecret`. Supply credentials privately.
 
-Assign the `Administrator` role privately to trusted accounts. Public registration grants no administrator access. Configure email delivery for account confirmation before enabling public signups.
+To create the administrator, set `Admin__Email` and `Admin__Password` privately before the first run. Public registration grants no administrator access, even with the same email address. Email confirmation is off until email delivery is set up.
