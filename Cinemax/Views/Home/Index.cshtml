@@ -1,7 +1,7 @@
 @model Cinemax.Models.HomeViewModel
 
 @{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "Find your next movie";
     var featured = Model.Featured;
 }
 
@@ -9,11 +9,20 @@
 {
     <section class="hero" style="--hero-image: url('@featured.BackdropUrl')">
         <div class="hero-inner">
-            <p class="eyebrow">Popular now</p>
+            <p class="eyebrow">Featured tonight</p>
             <h1>@featured.MovieTitle</h1>
-            <p class="hero-meta">@featured.ReleaseYear &middot; @featured.Genre?.Name &middot; @featured.DurationFormatted</p>
+            <p class="hero-meta">
+                @if (featured.TmdbRating is double rating)
+                {
+                    <span class="meta-score">&#9733; @rating.ToString("0.0")</span>
+                }
+                <span>@featured.ReleaseYear</span><span>@featured.Genre?.Name</span><span>@featured.DurationFormatted</span>
+            </p>
             <p class="hero-text">@featured.Overview</p>
-            <a class="btn btn-primary" asp-controller="Movie" asp-action="Details" asp-route-id="@featured.MovieId">See details and reviews</a>
+            <div class="hero-actions">
+                <a class="btn btn-primary btn-lg" asp-controller="Movie" asp-action="Details" asp-route-id="@featured.MovieId">See movie</a>
+                <a class="btn btn-ghost btn-lg" asp-controller="Movie" asp-action="Index">Browse all</a>
+            </div>
         </div>
     </section>
 }
@@ -23,42 +32,47 @@ else
         <div class="hero-inner">
             <h1>Find your next movie</h1>
             <p class="hero-text">Browse the catalogue, then see what other viewers thought.</p>
-            <a class="btn btn-primary" asp-controller="Movie" asp-action="Index">Browse movies</a>
+            <a class="btn btn-primary btn-lg" asp-controller="Movie" asp-action="Index">Browse movies</a>
         </div>
     </section>
 }
 
-<div class="page">
+<div class="page home-rows">
     @if (Model.Movies.Count > 0)
     {
-        <div class="section-head">
-            <h2>Popular movies</h2>
-            <a asp-controller="Movie" asp-action="Index">See all</a>
-        </div>
-        <div class="movie-grid">
-            @foreach (var movie in Model.Movies.Where(m => m != featured).Take(12))
-            {
-                <partial name="_MovieCard" model="movie" />
-            }
-        </div>
+        <section>
+            <div class="section-head">
+                <h2>Popular now</h2>
+                <a class="text-link" asp-controller="Movie" asp-action="Index">See all</a>
+            </div>
+            <partial name="_MovieRail" model="Model.Movies.Where(m => m != featured)" />
+        </section>
+    }
+
+    @foreach (var row in Model.GenreRows)
+    {
+        <section>
+            <div class="section-head">
+                <h2>Top in @row.Genre.Name</h2>
+                <a class="text-link" asp-controller="Movie" asp-action="Index" asp-route-genreId="@row.Genre.GenreId">See all</a>
+            </div>
+            <partial name="_MovieRail" model="row.Movies" />
+        </section>
     }
 
     @if (Model.LatestReviews.Count > 0)
     {
-        <div class="section-head">
-            <h2>Latest reviews</h2>
-            <a asp-controller="Review" asp-action="Index">See all</a>
-        </div>
-        <div class="review-list">
-            @foreach (var review in Model.LatestReviews)
-            {
-                <article class="review-card">
-                    <a asp-controller="Movie" asp-action="Details" asp-route-id="@review.MovieId"><strong>@review.Movie?.MovieTitle</strong></a>
-                    <partial name="_Stars" model="review.Rating" />
-                    <p>@review.ReviewMessage</p>
-                    <small>@review.ReviewerName</small>
-                </article>
-            }
-        </div>
+        <section>
+            <div class="section-head">
+                <h2>Latest reviews</h2>
+                <a class="text-link" asp-controller="Review" asp-action="Index">See all</a>
+            </div>
+            <div class="review-list">
+                @foreach (var review in Model.LatestReviews)
+                {
+                    <partial name="_ReviewCard" model="review" view-data='new ViewDataDictionary(ViewData) { ["ShowMovie"] = true }' />
+                }
+            </div>
+        </section>
     }
 </div>

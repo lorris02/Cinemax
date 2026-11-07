@@ -1,0 +1,34 @@
+@model Cinemax.Models.Review
+@{
+    var showMovie = ViewData["ShowMovie"] as bool? ?? false;
+    var fromTmdb = Model.TmdbReviewId != null;
+}
+
+<article class="review-card">
+    <header class="review-head">
+        <span class="avatar" aria-hidden="true">@(string.IsNullOrEmpty(Model.ReviewerName) ? "?" : Model.ReviewerName[..1].ToUpperInvariant())</span>
+        <div class="review-who">
+            <strong>@Model.ReviewerName</strong>
+            <small>@(fromTmdb ? "Review from TMDB" : "Cinemax viewer")</small>
+        </div>
+        <partial name="_Stars" model="Model.Rating" />
+    </header>
+    @if (showMovie)
+    {
+        <a class="review-movie" asp-controller="Movie" asp-action="Details" asp-route-id="@Model.MovieId">@Model.Movie?.MovieTitle</a>
+    }
+    <p class="review-text">@Model.ReviewMessage</p>
+    @if (Model.SourceUrl != null)
+    {
+        <a class="text-link" href="@Model.SourceUrl" target="_blank" rel="noopener nofollow">Read in full on TMDB</a>
+    }
+    @if (User.IsInRole("Administrator"))
+    {
+        <div class="admin-row">
+            <a class="btn btn-ghost btn-sm" asp-controller="Review" asp-action="Edit" asp-route-id="@Model.ReviewId">Edit</a>
+            <form asp-controller="Review" asp-action="Delete" asp-route-id="@Model.ReviewId" method="post" onsubmit="return confirm('Delete this review?');">
+                <button type="submit" class="btn btn-danger-soft btn-sm">Delete</button>
+            </form>
+        </div>
+    }
+</article>

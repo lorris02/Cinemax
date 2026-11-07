@@ -2,10 +2,12 @@
 
 @{
     ViewData["Title"] = "Add from TMDB";
+    ViewData["HideNavSearch"] = true;
     var error = (TempData["ImportError"] as string) ?? (ViewBag.Error as string);
 }
 
-<div class="page narrow">
+<div class="page">
+    <a class="back-link" asp-controller="Movie" asp-action="Index">&larr; Back to movies</a>
     <h1>Add from TMDB</h1>
     @if (ViewBag.Enabled != true)
     {
@@ -13,28 +15,38 @@
     }
     else
     {
-        <form class="filter-bar" method="get" asp-action="Index" role="search">
-            <input class="form-control" type="search" name="q" value="@ViewBag.Query" placeholder="Search TMDB" aria-label="Search TMDB" />
-            <button class="btn btn-primary" type="submit">Search</button>
+        <p class="lead-text">Search TMDB, then add a movie with its poster, cast and reviews.</p>
+        <form class="search-box page-search" method="get" asp-action="Index" role="search">
+            <input class="form-control form-control-lg" type="search" name="q" value="@ViewBag.Query" placeholder="Search TMDB" aria-label="Search TMDB" />
+            <button class="btn btn-primary btn-lg" type="submit">Search</button>
         </form>
         @if (error != null)
         {
-            <p class="text-danger" role="alert">@error</p>
+            <p class="form-error" role="alert">@error</p>
         }
-        <ul class="import-list">
+        <div class="movie-grid">
             @foreach (var movie in Model)
             {
-                <li>
-                    <div>
-                        <strong>@movie.Title</strong>
-                        <small>@(movie.ReleaseDate?.Length >= 4 ? movie.ReleaseDate[..4] : "Year unknown")</small>
-                    </div>
+                var poster = new Cinemax.Models.Movie { PosterPath = Cinemax.Services.MovieImporter.CleanPath(movie.PosterPath) }.PosterUrl;
+                <div class="import-card">
+                    <span class="poster">
+                        @if (poster != null)
+                        {
+                            <img src="@poster" alt="Poster for @movie.Title" loading="lazy" width="500" height="750" />
+                        }
+                        else
+                        {
+                            <span class="poster-empty">@movie.Title</span>
+                        }
+                    </span>
+                    <span class="movie-card-title">@movie.Title</span>
+                    <span class="movie-card-meta">@(movie.ReleaseDate?.Length >= 4 ? movie.ReleaseDate[..4] : "Year unknown")</span>
                     <form asp-action="Add" method="post">
                         <input type="hidden" name="tmdbId" value="@movie.Id" />
-                        <button type="submit" class="btn btn-outline-light btn-sm">Add</button>
+                        <button type="submit" class="btn btn-ghost btn-sm w-100">Add</button>
                     </form>
-                </li>
+                </div>
             }
-        </ul>
+        </div>
     }
 </div>

@@ -1,0 +1,8 @@
+@model IEnumerable<Cinemax.Models.Movie>
+
+<div class="rail" tabindex="0" aria-label="Movies, scroll sideways for more">
+    @foreach (var movie in Model)
+    {
+        <partial name="_MovieCard" model="movie" />
+    }
+</div>

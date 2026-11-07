@@ -1,0 +1,26 @@
+@{
+    Layout = "/Areas/Identity/Pages/_Layout.cshtml";
+    ViewData["PageClass"] = "";
+    var page = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
+    string Active(string name) => page.EndsWith("/" + name) ? "active" : "";
+}
+
+<div class="page-head">
+    <h1>Your profile</h1>
+    <p class="lead-text">Manage your account and sign-in details</p>
+</div>
+<div class="settings">
+    <nav class="settings-nav" aria-label="Profile settings">
+        <a class="@Active("Index")" asp-page="./Index">Profile</a>
+        <a class="@Active("ChangePassword")" asp-page="./ChangePassword">Password</a>
+        <a class="@Active("TwoFactorAuthentication")" asp-page="./TwoFactorAuthentication">Two-step sign-in</a>
+        <a class="@Active("PersonalData")" asp-page="./PersonalData">Your data</a>
+    </nav>
+    <div class="settings-body">
+        @RenderBody()
+    </div>
+</div>
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}

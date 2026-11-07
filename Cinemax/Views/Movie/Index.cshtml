@@ -2,53 +2,78 @@
 
 @{
     ViewData["Title"] = "Movies";
+    ViewData["HideNavSearch"] = true;
     var genres = (IEnumerable<Cinemax.Models.Genre>)ViewBag.Genres;
     int? selected = ViewBag.GenreId;
+    string? query = ViewBag.Query;
+    int total = ViewBag.Total;
+    var searching = !string.IsNullOrWhiteSpace(query);
+    var isAdmin = User.IsInRole("Administrator");
 }
 
 <div class="page">
     <div class="section-head page-head">
-        <h1>Movies</h1>
-        <div class="head-actions">
-            @if (User.IsInRole("Administrator"))
-            {
-                <a class="btn btn-outline-light btn-sm" asp-controller="MovieImport" asp-action="Index">Add from TMDB</a>
-                <a class="btn btn-outline-light btn-sm" asp-action="Create">Add manually</a>
-            }
+        <div>
+            <h1>@(searching ? "Search results" : "Movies")</h1>
+            <p class="lead-text">@total @(total == 1 ? "movie" : "movies")@(searching ? $" matching \"{query}\"" : " to explore")</p>
         </div>
+        @if (isAdmin)
+        {
+            <div class="head-actions">
+                <a class="btn btn-primary btn-sm" asp-controller="MovieImport" asp-action="Index">Add from TMDB</a>
+                <a class="btn btn-ghost btn-sm" asp-action="Create">Add manually</a>
+            </div>
+        }
     </div>
 
-    <form class="filter-bar" method="get" asp-action="Index" role="search">
-        <input class="form-control" type="search" name="q" value="@ViewBag.Query" placeholder="Search by title or director" aria-label="Search movies" />
-        <select class="form-select" name="genreId" aria-label="Filter by genre">
-            <option value="">All genres</option>
-            @foreach (var genre in genres)
-            {
-                <option value="@genre.GenreId" selected="@(selected == genre.GenreId)">@genre.Name</option>
-            }
-        </select>
-        <button class="btn btn-primary" type="submit">Search</button>
+    <form class="search-box page-search" method="get" asp-action="Index" role="search">
+        <input class="form-control form-control-lg" type="search" name="q" value="@query" placeholder="Search movies, directors, cast" aria-label="Search movies" autocomplete="off" data-live-search />
+        @if (selected != null)
+        {
+            <input type="hidden" name="genreId" value="@selected" />
+        }
+        <button class="btn btn-primary btn-lg" type="submit">Search</button>
     </form>
+
+    <div class="chips" aria-label="Filter by genre">
+        <a class="chip @(selected == null ? "active" : "")" asp-action="Index" asp-route-q="@query">All</a>
+        @foreach (var genre in genres)
+        {
+            <a class="chip @(selected == genre.GenreId ? "active" : "")" asp-action="Index" asp-route-q="@query" asp-route-genreId="@genre.GenreId">@genre.Name</a>
+        }
+    </div>
 
     @if (!Model.Any())
     {
-        <p class="empty-state">No movies found. Try a different search.</p>
+        <p class="empty-state" id="no-local">@(searching ? "Nothing in Cinemax yet. Checking TMDB..." : "No movies here yet.")</p>
     }
     <div class="movie-grid">
         @foreach (var movie in Model)
         {
             <div>
                 <partial name="_MovieCard" model="movie" />
-                @if (User.IsInRole("Administrator"))
+                @if (isAdmin)
                 {
                     <div class="admin-row">
-                        <a asp-action="Edit" asp-route-id="@movie.MovieId">Edit</a>
+                        <a class="btn btn-ghost btn-sm" asp-action="Edit" asp-route-id="@movie.MovieId">Edit</a>
                         <form asp-action="Delete" asp-route-id="@movie.MovieId" method="post" onsubmit="return confirm('Delete this movie?');">
-                            <button type="submit" class="btn btn-link p-0 text-danger">Delete</button>
+                            <button type="submit" class="btn btn-danger-soft btn-sm">Delete</button>
                         </form>
                     </div>
                 }
             </div>
         }
     </div>
+
+    <partial name="_Pager" view-data='new ViewDataDictionary(ViewData) { ["Route"] = new Dictionary<string, string?> { ["q"] = query, ["genreId"] = selected?.ToString() } }' />
+
+    @if (searching)
+    {
+        <section id="tmdb-results" data-query="@query" hidden>
+            <div class="section-head">
+                <h2>More from TMDB</h2>
+            </div>
+            <div class="movie-grid"></div>
+        </section>
+    }
 </div>

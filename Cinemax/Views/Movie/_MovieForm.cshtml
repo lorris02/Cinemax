@@ -1,0 +1,54 @@
+@model Cinemax.Models.Movie
+
+<form asp-action="@ViewData["FormAction"]" class="form-card">
+    <div asp-validation-summary="ModelOnly" class="form-error"></div>
+    @if (Model?.MovieId > 0)
+    {
+        <input type="hidden" asp-for="MovieId" />
+    }
+
+    <div class="field">
+        <label asp-for="MovieTitle">Movie title</label>
+        <input asp-for="MovieTitle" class="form-control" placeholder="e.g. Spirited Away" />
+        <span asp-validation-for="MovieTitle" class="field-error"></span>
+    </div>
+    <div class="field-row">
+        <div class="field">
+            <label asp-for="Director">Director</label>
+            <input asp-for="Director" class="form-control" placeholder="e.g. Hayao Miyazaki" />
+            <span asp-validation-for="Director" class="field-error"></span>
+        </div>
+        <div class="field">
+            <label asp-for="GenreId">Genre</label>
+            <select asp-for="GenreId" class="form-select" asp-items="ViewBag.GenreId"></select>
+            <span asp-validation-for="GenreId" class="field-error"></span>
+        </div>
+    </div>
+    <div class="field-row">
+        <div class="field">
+            <label asp-for="ReleaseYear">Release year</label>
+            <input asp-for="ReleaseYear" class="form-control" inputmode="numeric" />
+            <span asp-validation-for="ReleaseYear" class="field-error"></span>
+        </div>
+        <div class="field">
+            <label asp-for="Duration">Runtime in minutes</label>
+            <input asp-for="Duration" class="form-control" inputmode="numeric" />
+            <span asp-validation-for="Duration" class="field-error"></span>
+        </div>
+    </div>
+    <div class="field">
+        <label asp-for="TopCast">Main cast <span class="optional">Optional</span></label>
+        <input asp-for="TopCast" class="form-control" placeholder="Names separated by commas" />
+        <span asp-validation-for="TopCast" class="field-error"></span>
+    </div>
+    <div class="field">
+        <label asp-for="Overview">Summary <span class="optional">Optional</span></label>
+        <textarea asp-for="Overview" class="form-control" rows="5" placeholder="What is this movie about?"></textarea>
+        <span asp-validation-for="Overview" class="field-error"></span>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">@ViewData["SubmitText"]</button>
+        <a class="btn btn-ghost" asp-action="Index">Cancel</a>
+    </div>
+</form>
