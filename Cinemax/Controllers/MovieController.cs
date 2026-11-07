@@ -47,7 +47,7 @@ namespace Cinemax.Controllers
         }
 
         //create method to return the create view
-        [Authorize(Roles = "Administrator")]
+        [Authorize]
         public IActionResult Create()
         {
             ViewBag.GenreId = new SelectList(_context.Genres.ToList(), "GenreId", "Name");
@@ -55,7 +55,7 @@ namespace Cinemax.Controllers
         }
 
 
-        [Authorize(Roles = "Administrator")]
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         //post method to create a movie 
