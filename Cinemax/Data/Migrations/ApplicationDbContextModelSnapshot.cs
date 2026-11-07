@@ -71,8 +71,14 @@ namespace Cinemax.Data.Migrations
                     b.Property<int>("ReleaseYear")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("TmdbDetailsLoaded")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int?>("TmdbId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<double?>("TmdbRating")
+                        .HasColumnType("REAL");
 
                     b.Property<string>("TopCast")
                         .HasMaxLength(300)
@@ -110,9 +116,20 @@ namespace Cinemax.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("SourceUrl")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TmdbReviewId")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
                     b.HasKey("ReviewId");
 
                     b.HasIndex("MovieId");
+
+                    b.HasIndex("TmdbReviewId")
+                        .IsUnique();
 
                     b.ToTable("Reviews");
                 });

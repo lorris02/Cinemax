@@ -44,7 +44,7 @@ namespace Cinemax.Controllers
                 {
                     return RedirectToAction("Details", "Movie", new { id = movie.MovieId });
                 }
-                TempData["ImportError"] = "That movie is missing details Cinemax needs, such as a runtime.";
+                TempData["ImportError"] = "That movie is missing details Cinemax needs, such as a release year.";
             }
             catch (Exception e) when (e is HttpRequestException or TaskCanceledException)
             {
