@@ -1,0 +1,68 @@
+@model Cinemax.Models.Movie
+
+@{
+    ViewData["Title"] = Model.MovieTitle;
+    var writeUrl = Url.Action("Create", "Review", new { movieId = Model.MovieId });
+}
+
+<section class="detail-hero" style="--hero-image: url('@Model.BackdropUrl')">
+    <div class="detail-inner">
+        @if (Model.PosterUrl != null)
+        {
+            <img class="detail-poster" src="@Model.PosterUrl" alt="Poster for @Model.MovieTitle" width="500" height="750" />
+        }
+        <div>
+            <h1>@Model.MovieTitle</h1>
+            <p class="hero-meta">@Model.ReleaseYear &middot; @Model.Genre?.Name &middot; @Model.DurationFormatted</p>
+            @if (Model.AverageRating is double rating)
+            {
+                <p class="score">&#9733; @rating.ToString("0.0") <small>from @Model.Reviews.Count viewer @(Model.Reviews.Count == 1 ? "review" : "reviews")</small></p>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.Overview))
+            {
+                <p>@Model.Overview</p>
+            }
+            <dl class="facts">
+                <dt>Director</dt>
+                <dd>@Model.Director</dd>
+                @if (!string.IsNullOrWhiteSpace(Model.TopCast))
+                {
+                    <dt>Cast</dt>
+                    <dd>@Model.TopCast</dd>
+                }
+            </dl>
+            @if (User.IsInRole("Administrator"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.MovieId">Edit movie</a>
+            }
+        </div>
+    </div>
+</section>
+
+<div class="page narrow">
+    <div class="section-head">
+        <h2>Reviews</h2>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a class="btn btn-primary btn-sm" href="@writeUrl">Write a review</a>
+        }
+        else
+        {
+            <a class="btn btn-primary btn-sm" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@writeUrl">Log in to review</a>
+        }
+    </div>
+    @if (Model.Reviews.Count == 0)
+    {
+        <p class="empty-state">No reviews yet. Be the first to share your thoughts.</p>
+    }
+    <div class="review-list single">
+        @foreach (var review in Model.Reviews.OrderByDescending(r => r.ReviewId))
+        {
+            <article class="review-card">
+                <partial name="_Stars" model="review.Rating" />
+                <p>@review.ReviewMessage</p>
+                <small>@review.ReviewerName</small>
+            </article>
+        }
+    </div>
+</div>

@@ -13,6 +13,11 @@ namespace Cinemax.Data
         public DbSet<Movie> Movies { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Genre> Genres { get; set; }
-        
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+            builder.Entity<Movie>().HasIndex(m => m.TmdbId).IsUnique();
+        }
     }
 }

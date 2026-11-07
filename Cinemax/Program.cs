@@ -1,4 +1,5 @@
 using Cinemax.Data;
+using Cinemax.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,13 +8,21 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()// enables role management
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+// The client logger is removed so the API key in request URLs never reaches the logs.
+builder.Services.AddHttpClient<ITmdbClient, TmdbClient>(client =>
+{
+    client.BaseAddress = new Uri("https://api.themoviedb.org/3/");
+    client.Timeout = TimeSpan.FromSeconds(15);
+}).RemoveAllLoggers();
+builder.Services.AddScoped<MovieImporter>();
 
 // Optional providers are enabled only when both credentials are configured.
 var authentication = builder.Services.AddAuthentication();
@@ -30,6 +39,8 @@ if (!string.IsNullOrWhiteSpace(githubId) && !string.IsNullOrWhiteSpace(githubSec
     authentication.AddGitHub(options => { options.ClientId = githubId; options.ClientSecret = githubSecret; });
 }
 var app = builder.Build();
+
+await DatabaseSetup.RunAsync(app.Services, app.Configuration);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

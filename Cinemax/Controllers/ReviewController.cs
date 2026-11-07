@@ -20,7 +20,7 @@ namespace Cinemax.Controllers
         {
             // fetch list of reviews from db including movie info, and order it by reviewer name
             var reviews = _context.Reviews
-                .OrderBy(r => r.ReviewerName)
+                .OrderByDescending(r => r.ReviewId)
                 .Include(r => r.Movie)
                 .ToList();
 
@@ -30,10 +30,10 @@ namespace Cinemax.Controllers
 
         //get method to return an empty form for the create view
         [Authorize]
-        public IActionResult Create()
+        public IActionResult Create(int? movieId = null)
         {
             // fetch list of movietitles for the movieid dropdown in the form
-            ViewBag.MovieId = new SelectList(_context.Movies.ToList(), "MovieId","MovieTitle");
+            ViewBag.MovieId = new SelectList(_context.Movies.OrderBy(m => m.MovieTitle).ToList(), "MovieId", "MovieTitle", movieId);
 
             // display empty form so users can add a review
             return View();
@@ -60,7 +60,7 @@ namespace Cinemax.Controllers
             // save to db then redirect to index
             _context.Reviews.Add(review);
             _context.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("Details", "Movie", new { id = review.MovieId });
         }
 
         //get method to return a populated form for the edit view

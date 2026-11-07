@@ -1,90 +1,57 @@
 @model IEnumerable<Cinemax.Models.Movie>
 
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Movies";
+    var genres = (IEnumerable<Cinemax.Models.Genre>)ViewBag.Genres;
+    int? selected = ViewBag.GenreId;
 }
-<h1>Explore Our Movie Collections</h1>
-<p>
-    Use the movie list below to explore your favorite directors, compare release dates,
-    or check out recent films added to our collection. Stay tuned, we’re always adding more classics and new releases,and also if you will like to add a Movie,pls feel free
-</p>
 
-<p>
-	@if (User.Identity.IsAuthenticated)//check if user is logged in
+<div class="page">
+    <div class="section-head page-head">
+        <h1>Movies</h1>
+        <div class="head-actions">
+            @if (User.IsInRole("Administrator"))
+            {
+                <a class="btn btn-outline-light btn-sm" asp-controller="MovieImport" asp-action="Index">Add from TMDB</a>
+            }
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a class="btn btn-outline-light btn-sm" asp-action="Create">Add manually</a>
+            }
+        </div>
+    </div>
+
+    <form class="filter-bar" method="get" asp-action="Index" role="search">
+        <input class="form-control" type="search" name="q" value="@ViewBag.Query" placeholder="Search by title or director" aria-label="Search movies" />
+        <select class="form-select" name="genreId" aria-label="Filter by genre">
+            <option value="">All genres</option>
+            @foreach (var genre in genres)
+            {
+                <option value="@genre.GenreId" selected="@(selected == genre.GenreId)">@genre.Name</option>
+            }
+        </select>
+        <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+
+    @if (!Model.Any())
     {
-        <a asp-action="Create">Add a New Movie</a>
+        <p class="empty-state">No movies found. Try a different search.</p>
     }
-    else
-	{
-		//i asked ai this,so it redirects the user back to the exact place after login
-		//i kmew the area was the identity but i was not sure about the rest
-        <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Create", "Movie")" class="btn btn-primary">
-            Login to add a movie
-        </a>
-
-    }
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-				Movie Title
-            </th>
-            <th>
-                Director
-            </th>
-            <th>
-                Genre
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.GenreId)
-            </th>
-            <th>
-				Year Released
-            </th>
-            <th>
-				Movie Duration
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.MovieTitle)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Director)
-            </td>
-            <td>
-                @item.Genre?.Name
-            </td>
-            <td>
-                    @Html.DisplayFor(modelItem => item.GenreId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReleaseYear)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DurationFormatted)
-            </td>
-            <td>
-                  @if (User.IsInRole("Administrator"))
+    <div class="movie-grid">
+        @foreach (var movie in Model)
+        {
+            <div>
+                <partial name="_MovieCard" model="movie" />
+                @if (User.IsInRole("Administrator"))
                 {
-                 <text>
-                  <a asp-action="Edit" asp-route-id="@item.MovieId">Edit</a> |
-                  <form asp-action="Delete" asp-route-id="@item.MovieId" method="post" class="d-inline" onsubmit="return confirm('Delete this movie?');">
-                      <button type="submit" class="btn btn-link p-0 text-danger">Delete</button>
-                  </form>
-                  </text>
-                    }
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
-<p>
-    Unsure which genre to pick? Check out our list of genres and their descriptions <a asp-area="" asp-controller="Genre" asp-action="Index">here</a>
-</p>
+                    <div class="admin-row">
+                        <a asp-action="Edit" asp-route-id="@movie.MovieId">Edit</a>
+                        <form asp-action="Delete" asp-route-id="@movie.MovieId" method="post" onsubmit="return confirm('Delete this movie?');">
+                            <button type="submit" class="btn btn-link p-0 text-danger">Delete</button>
+                        </form>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
