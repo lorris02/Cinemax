@@ -1,11 +1,12 @@
 @model IEnumerable<Cinemax.Models.Genre>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Genres";
 }
 
-<h1>Movie Genres</h1>
-<p>Browse through our movie genres and discover films that match your mood. Each genre offers a unique cinematic experience.</p>
+<div class="page">
+<h1>Genres</h1>
+<p class="lead-text">Pick a genre to see the movies in it.</p>
 
 
 <p>
@@ -26,9 +27,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.Description)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.GenreId)
-            </th>
             <th></th>
         </tr>
     </thead>
@@ -36,16 +34,11 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
+                <a asp-controller="Movie" asp-action="Index" asp-route-genreId="@item.GenreId">@item.Name</a>
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.GenreId)
-                </td>
-
-	        
             <td>
 					@if (User.IsInRole("Administrator"))//i addded this to restrict access to only admin,cuz i want only admins to be albe to edit anythiing concerning the genres
                  {
@@ -61,6 +54,4 @@
 }
     </tbody>
 </table>
-<p>
-    Now that you've picked a genre, check out movies that suit your taste<a asp-controller="Movie" asp-action="Index"> here</a>.
-</p>
+</div>

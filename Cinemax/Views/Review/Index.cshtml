@@ -4,91 +4,41 @@
     ViewData["Title"] = "Reviews";
 }
 
-<h1>Movie Reviews</h1>
-<p>
-    See what viewers like you are saying about our movie collection. Ratings and comments help others discover new favorites.
-</p>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Name
-            </th>
-            <th>
-                Movie Title
-            </th>
-            <th>
-                Review
-            </th>
-            <th>
-                Rating
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MovieId)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReviewerName)
-            </td>
-            <td>
-                @item.Movie?.MovieTitle
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReviewMessage)
-            </td>
-                <td>
-                    @{
-                        int fullStars = item.Rating; 
-                        int emptyStars = 5 - fullStars;
-                    }
-                    @for (int i = 0; i < fullStars; i++)
-                    {
-                        <text>⭐</text>
-                    }
-                    @for (int i = 0; i < emptyStars; i++)
-                    {
-                        <text>☆</text>
-                    }
-                </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MovieId)
-            </td>
-            <td>
-					@if (User.IsInRole("Administrator")) //check if user is logged in
-                 {
-                  <text>
-                  <a asp-action="Edit" asp-route-id="@item.ReviewId">Edit</a> |
-                  <form asp-action="Delete" asp-route-id="@item.ReviewId" method="post" class="d-inline" onsubmit="return confirm('Delete this review?');">
-                      <button type="submit" class="btn btn-link p-0 text-danger">Delete</button>
-                  </form>
-                  </text>
-                 }
-              </td>
-        </tr>
+<div class="page narrow">
+    <div class="section-head page-head">
+        <h1>Reviews</h1>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a class="btn btn-primary btn-sm" asp-action="Create">Write a review</a>
         }
+        else
+        {
+            <a class="btn btn-primary btn-sm" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Create", "Review")">Log in to review</a>
+        }
+    </div>
 
-    </tbody>
-</table>
-
-<p>
-	@if (User.Identity.IsAuthenticated) //check if user is logged in
+    @if (!Model.Any())
     {
-    <p>Want to share your thoughts? <a asp-action="Create">Add a review</a> today!</p>
+        <p class="empty-state">No reviews yet. Pick a movie and write the first one.</p>
     }
-    else
-    {
-       //i asked ai this,so it redirects the user back to the exact place after login
-      //i knew the area was the identity but i was not sure about the rest
-    <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Create", "Review")" class="btn btn-primary">
-        Login to add your review
-    </a>
-
-    }
-</p>
-
+    <div class="review-list single">
+        @foreach (var item in Model)
+        {
+            <article class="review-card">
+                <a asp-controller="Movie" asp-action="Details" asp-route-id="@item.MovieId"><strong>@item.Movie?.MovieTitle</strong></a>
+                <partial name="_Stars" model="item.Rating" />
+                <p>@item.ReviewMessage</p>
+                <small>@item.ReviewerName</small>
+                @if (User.IsInRole("Administrator"))
+                {
+                    <div class="admin-row">
+                        <a asp-action="Edit" asp-route-id="@item.ReviewId">Edit</a>
+                        <form asp-action="Delete" asp-route-id="@item.ReviewId" method="post" onsubmit="return confirm('Delete this review?');">
+                            <button type="submit" class="btn btn-link p-0 text-danger">Delete</button>
+                        </form>
+                    </div>
+                }
+            </article>
+        }
+    </div>
+</div>

@@ -1,78 +1,64 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model Cinemax.Models.HomeViewModel
+
+@{
+    ViewData["Title"] = "Home";
+    var featured = Model.Featured;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome to CINEMAX </h1>
-    <p>
-        CINEMAX is your home for the best movies across every genre, from every corner of the world.
-        You can browse, add, edit, or delete movies, manage genres, and explore reviews all in one clean and easy-to-use platform.
-    </p>
-    <p>
-        We feature movies across genres like Action, Comedy, Drama, Romance, and more. Each movie entry highlights essential details such as the director, release year, and duration so that way you can easily discover films that match your taste.
-        Whether you’re tracking your favorite films or organizing a watchlist,
-        Cinemax helps you keep everything in one place.
-        Start by visiting the <a asp-area="" asp-controller="Movie" asp-action="Index">Movies</a> section to explore the full collection
-    </p>
-    <p>Want to know what others think? Read the <a asp-area="" asp-controller="Review" asp-action="Index">Reviews</a> to find out which movies are fan favorites</p>
+@if (featured != null)
+{
+    <section class="hero" style="--hero-image: url('@featured.BackdropUrl')">
+        <div class="hero-inner">
+            <p class="eyebrow">Popular now</p>
+            <h1>@featured.MovieTitle</h1>
+            <p class="hero-meta">@featured.ReleaseYear &middot; @featured.Genre?.Name &middot; @featured.DurationFormatted</p>
+            <p class="hero-text">@featured.Overview</p>
+            <a class="btn btn-primary" asp-controller="Movie" asp-action="Details" asp-route-id="@featured.MovieId">See details and reviews</a>
+        </div>
+    </section>
+}
+else
+{
+    <section class="hero hero-plain">
+        <div class="hero-inner">
+            <h1>Find your next movie</h1>
+            <p class="hero-text">Browse the catalogue, then see what other viewers thought.</p>
+            <a class="btn btn-primary" asp-controller="Movie" asp-action="Index">Browse movies</a>
+        </div>
+    </section>
+}
+
+<div class="page">
+    @if (Model.Movies.Count > 0)
+    {
+        <div class="section-head">
+            <h2>Popular movies</h2>
+            <a asp-controller="Movie" asp-action="Index">See all</a>
+        </div>
+        <div class="movie-grid">
+            @foreach (var movie in Model.Movies.Where(m => m != featured).Take(12))
+            {
+                <partial name="_MovieCard" model="movie" />
+            }
+        </div>
+    }
+
+    @if (Model.LatestReviews.Count > 0)
+    {
+        <div class="section-head">
+            <h2>Latest reviews</h2>
+            <a asp-controller="Review" asp-action="Index">See all</a>
+        </div>
+        <div class="review-list">
+            @foreach (var review in Model.LatestReviews)
+            {
+                <article class="review-card">
+                    <a asp-controller="Movie" asp-action="Details" asp-route-id="@review.MovieId"><strong>@review.Movie?.MovieTitle</strong></a>
+                    <partial name="_Stars" model="review.Rating" />
+                    <p>@review.ReviewMessage</p>
+                    <small>@review.ReviewerName</small>
+                </article>
+            }
+        </div>
+    }
 </div>
-
-<h3>About CINEMAX</h3>
-<p>
-    Founded in 2024, CINEMAX was created to bring movie lovers together in one place.
-    Our platform offers a growing collection of films from every genre from timeless classics
-    to the latest blockbusters. Whether you’re searching by director, release year, or duration,
-    CINEMAX makes discovering your next favorite movie effortless.
-</p>
-
-<!--
-<section id="team">
-    <h3>Meet Our Team</h3>
-    <p>Behind CINEMAX is a passionate team of movie lovers, creators, and developers dedicated to bringing you the best movie experience. Each member contributes unique talent,from design and storytelling to coding and innovation.</p>
-
-    <div class="team-container">
-        <div class="team-card">
-            <img src="~/images/team1.jpg" alt="Lorris - Founder" />
-            <h4>Lorris</h4>
-            <p>Founder & Lead Developer</p>
-        </div>
-        <div class="team-card">
-            <img src="~/images/team2.jpg" alt="Ava - Designer" />
-            <h4>Ava</h4>
-            <p>UI/UX Designer</p>
-        </div>
-        <div class="team-card">
-            <img src="~/images/team3.jpg" alt="Mason - Backend Dev" />
-            <h4>Mason</h4>
-            <p>Backend Engineer</p>
-        </div>
-        <div class="team-card">
-            <img src="~/images/team4.jpg" alt="Nora - Content Creator" />
-            <h4>Nora</h4>
-            <p>Content Creator</p>
-        </div>
-    </div>
-</section>
--->
-
-
-<section id="contact">
-    <h3>Contact Us</h3>
-    <p>We’d love to hear from you.Whether it’s feedback, partnership inquiries, or just to say hi, reach out below.</p>
-
-    <form method="post" action="#">
-        <div class="form-group">
-            <label for="name">Your Name</label>
-            <input type="text" id="name" class="form-control" placeholder="Enter your name" required />
-        </div>
-        <div class="form-group">
-            <label for="email">Your Email</label>
-            <input type="email" id="email" class="form-control" placeholder="Enter your email" required />
-        </div>
-        <div class="form-group">
-            <label for="message">Your Message</label>
-            <textarea id="message" class="form-control" rows="4" placeholder="Type your message..." required></textarea>
-        </div>
-        <input type="submit" value="Send Message" />
-    </form>
-</section>
