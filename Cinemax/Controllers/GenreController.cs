@@ -39,12 +39,14 @@ namespace Cinemax.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create([Bind("Name,Description")] Models.Genre genre)
         {
+            RejectDuplicate(genre);
             if (!ModelState.IsValid)
             {
                 return View(genre);
             }
             _context.Genres.Add(genre);
             _context.SaveChanges();
+            TempData["Success"] = $"{genre.Name} was added.";
             return RedirectToAction("Index");
         }
         //get method to edit a genre
@@ -67,6 +69,7 @@ namespace Cinemax.Controllers
             if (id != genre.GenreId) return BadRequest();
             var existing = _context.Genres.Find(id);
             if (existing == null) return NotFound();
+            RejectDuplicate(genre);
             if (!ModelState.IsValid)
             {
                 return View(genre);
@@ -74,6 +77,7 @@ namespace Cinemax.Controllers
             existing.Name = genre.Name;
             existing.Description = genre.Description;
             _context.SaveChanges();
+            TempData["Success"] = $"{genre.Name} was updated.";
             return RedirectToAction("Index");
         }
         // Genres in use must remain available to their movies.
@@ -87,10 +91,24 @@ namespace Cinemax.Controllers
             {
                 return NotFound();
             }
-            if (_context.Movies.Any(m => m.GenreId == id)) return Conflict("This genre is used by a movie.");
+            if (_context.Movies.Any(m => m.GenreId == id))
+            {
+                TempData["Notice"] = $"{genre.Name} still has movies, so it can't be removed.";
+                return RedirectToAction("Index");
+            }
             _context.Genres.Remove(genre);
             _context.SaveChanges();
+            TempData["Success"] = $"{genre.Name} was removed.";
             return RedirectToAction("Index");
+        }
+
+        private void RejectDuplicate(Models.Genre genre)
+        {
+            var name = genre.Name?.Trim().ToLower();
+            if (name != null && _context.Genres.Any(g => g.GenreId != genre.GenreId && g.Name!.ToLower() == name))
+            {
+                ModelState.AddModelError(nameof(genre.Name), $"{genre.Name} is already a genre.");
+            }
         }
     }
 }

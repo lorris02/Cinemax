@@ -41,9 +41,14 @@ namespace Cinemax.Controllers
         {
             try
             {
-                var movie = await _importer.ImportAsync(tmdbId);
+                var known = await _importer.FindAsync(tmdbId);
+                var movie = known ?? await _importer.ImportAsync(tmdbId);
                 if (movie != null)
                 {
+                    if (known == null)
+                    {
+                        TempData["Success"] = $"{movie.MovieTitle} was added to Cinemax.";
+                    }
                     return RedirectToAction("Details", "Movie", new { id = movie.MovieId });
                 }
                 TempData["Notice"] = "That movie is missing details Cinemax needs, so it can't be shown.";

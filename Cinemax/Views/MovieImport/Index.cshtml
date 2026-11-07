@@ -4,6 +4,7 @@
     ViewData["Title"] = "Add from TMDB";
     ViewData["HideNavSearch"] = true;
     var error = (TempData["ImportError"] as string) ?? (ViewBag.Error as string);
+    var known = (Dictionary<int, int>)ViewBag.Known;
 }
 
 <div class="page">
@@ -27,6 +28,7 @@
         <div class="movie-grid">
             @foreach (var movie in Model)
             {
+                var added = known.TryGetValue(movie.Id, out var movieId);
                 var poster = new Cinemax.Models.Movie { PosterPath = Cinemax.Services.MovieImporter.CleanPath(movie.PosterPath) }.PosterUrl;
                 <div class="import-card">
                     <span class="poster">
@@ -38,13 +40,25 @@
                         {
                             <span class="poster-empty">@movie.Title</span>
                         }
+                        @if (added)
+                        {
+                            <span class="added-badge">&#10003; Added</span>
+                        }
                     </span>
                     <span class="movie-card-title">@movie.Title</span>
                     <span class="movie-card-meta">@(movie.ReleaseDate?.Length >= 4 ? movie.ReleaseDate[..4] : "Year unknown")</span>
-                    <form asp-action="Add" method="post">
-                        <input type="hidden" name="tmdbId" value="@movie.Id" />
-                        <button type="submit" class="btn btn-ghost btn-sm w-100">Add</button>
-                    </form>
+                    @if (added)
+                    {
+                        <a class="btn btn-ghost btn-sm w-100 import-action" asp-controller="Movie" asp-action="Details" asp-route-id="@movieId">View movie</a>
+                    }
+                    else
+                    {
+                        <form asp-action="Add" method="post">
+                            <input type="hidden" name="tmdbId" value="@movie.Id" />
+                            <input type="hidden" name="q" value="@ViewBag.Query" />
+                            <button type="submit" class="btn btn-primary btn-sm w-100">Add to Cinemax</button>
+                        </form>
+                    }
                 </div>
             }
         </div>
