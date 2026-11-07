@@ -23,6 +23,15 @@ namespace Cinemax.Services
         [property: JsonPropertyName("cast")] List<TmdbCastMember>? Cast,
         [property: JsonPropertyName("crew")] List<TmdbCrewMember>? Crew);
 
+    public record TmdbAuthorDetails([property: JsonPropertyName("rating")] double? Rating);
+    public record TmdbReview(
+        [property: JsonPropertyName("id")] string? Id,
+        [property: JsonPropertyName("author")] string? Author,
+        [property: JsonPropertyName("content")] string? Content,
+        [property: JsonPropertyName("url")] string? Url,
+        [property: JsonPropertyName("author_details")] TmdbAuthorDetails? AuthorDetails);
+    public record TmdbReviewPage([property: JsonPropertyName("results")] List<TmdbReview>? Results);
+
     public record TmdbMovie(
         [property: JsonPropertyName("id")] int Id,
         [property: JsonPropertyName("title")] string? Title,
@@ -34,12 +43,15 @@ namespace Cinemax.Services
         [property: JsonPropertyName("adult")] bool Adult,
         [property: JsonPropertyName("softcore")] bool Softcore,
         [property: JsonPropertyName("genres")] List<TmdbGenre>? Genres,
-        [property: JsonPropertyName("credits")] TmdbCredits? Credits);
+        [property: JsonPropertyName("credits")] TmdbCredits? Credits,
+        [property: JsonPropertyName("vote_average")] double? VoteAverage = null,
+        [property: JsonPropertyName("reviews")] TmdbReviewPage? Reviews = null);
 
     public interface ITmdbClient
     {
         bool Enabled { get; }
         Task<IReadOnlyList<TmdbMovieSummary>> PopularAsync(int page = 1);
+        Task<IReadOnlyList<TmdbMovieSummary>> TopRatedAsync(int page = 1);
         Task<IReadOnlyList<TmdbMovieSummary>> SearchAsync(string query);
         Task<TmdbMovie?> GetMovieAsync(int id);
     }
@@ -60,11 +72,14 @@ namespace Cinemax.Services
         public async Task<IReadOnlyList<TmdbMovieSummary>> PopularAsync(int page = 1) =>
             Safe(await GetAsync<TmdbPage>($"movie/popular?page={page}"));
 
+        public async Task<IReadOnlyList<TmdbMovieSummary>> TopRatedAsync(int page = 1) =>
+            Safe(await GetAsync<TmdbPage>($"movie/top_rated?page={page}"));
+
         public async Task<IReadOnlyList<TmdbMovieSummary>> SearchAsync(string query) =>
             Safe(await GetAsync<TmdbPage>($"search/movie?include_adult=false&query={Uri.EscapeDataString(query)}"));
 
         public Task<TmdbMovie?> GetMovieAsync(int id) =>
-            GetAsync<TmdbMovie>($"movie/{id}?append_to_response=credits");
+            GetAsync<TmdbMovie>($"movie/{id}?append_to_response=credits,reviews");
 
         private static List<TmdbMovieSummary> Safe(TmdbPage? page) =>
             (page?.Results ?? new()).Where(m => !m.Adult && !m.Softcore).ToList();

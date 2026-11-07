@@ -113,6 +113,29 @@ public class RequestSecurityTests
     }
 
     [TestMethod]
+    public async Task MissingPagesShowTheNotFoundScreen()
+    {
+        var response = await client.GetAsync("/nope/nothing");
+        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+        StringAssert.Contains(await response.Content.ReadAsStringAsync(), "Page not found");
+    }
+
+    [TestMethod]
+    public async Task SuggestReturnsMatchesAndIgnoresOneLetter()
+    {
+        var body = await client.GetStringAsync("/Search/Suggest?q=m");
+        StringAssert.Contains(body, "\"local\":[]");
+        Assert.AreEqual(HttpStatusCode.OK, (await client.GetAsync("/Search/Suggest?q=movie")).StatusCode);
+    }
+
+    [TestMethod]
+    public async Task OpeningATmdbMovieRequiresTheFormToken()
+    {
+        var response = await client.PostAsync("/Search/Open", new FormUrlEncodedContent(new Dictionary<string, string> { ["tmdbId"] = "1" }));
+        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [TestMethod]
     public async Task OnlyAdminCanOpenTmdbImport()
     {
         Assert.AreEqual(HttpStatusCode.Unauthorized, (await client.GetAsync("/MovieImport")).StatusCode);

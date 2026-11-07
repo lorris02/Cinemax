@@ -1,5 +1,6 @@
 using Cinemax.Data;
 using Cinemax.Models;
+using Cinemax.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -10,6 +11,7 @@ namespace Cinemax.Controllers
     
     public class MovieController : Controller
     {
+        private const int PageSize = 24;
         private readonly ApplicationDbContext _context;
         //constructor to instantiate the db context
         public MovieController(ApplicationDbContext context)
@@ -18,22 +20,23 @@ namespace Cinemax.Controllers
         }
 
         //displays all data for the index view
-        public IActionResult Index(string? q = null, int? genreId = null)
+        public IActionResult Index(string? q = null, int? genreId = null, int page = 1)
         {
-            var query = _context.Movies.Include(m => m.Genre).Include(m => m.Reviews).AsQueryable();
-            if (!string.IsNullOrWhiteSpace(q))
-            {
-                var term = q.Trim().ToLower();
-                query = query.Where(m => m.MovieTitle!.ToLower().Contains(term) || m.Director!.ToLower().Contains(term));
-            }
+            var query = MovieSearch.Matching(_context.Movies.Include(m => m.Genre).Include(m => m.Reviews), q);
             if (genreId.HasValue)
             {
                 query = query.Where(m => m.GenreId == genreId);
             }
+            var total = query.Count();
+            var pages = Math.Max(1, (int)Math.Ceiling(total / (double)PageSize));
+            page = Math.Clamp(page, 1, pages);
             ViewBag.Query = q;
             ViewBag.GenreId = genreId;
+            ViewBag.Total = total;
+            ViewBag.Page = page;
+            ViewBag.Pages = pages;
             ViewBag.Genres = _context.Genres.OrderBy(g => g.Name).ToList();
-            return View("Index", query.OrderBy(m => m.MovieId).ToList());
+            return View("Index", query.OrderBy(m => m.MovieId).Skip((page - 1) * PageSize).Take(PageSize).ToList());
         }
 
         public IActionResult Details(int id)
@@ -43,6 +46,9 @@ namespace Cinemax.Controllers
             {
                 return NotFound();
             }
+            ViewBag.Related = _context.Movies.Include(m => m.Reviews)
+                .Where(m => m.GenreId == movie.GenreId && m.MovieId != id)
+                .OrderByDescending(m => m.TmdbRating).Take(12).ToList();
             return View("Details", movie);
         }
 
@@ -50,7 +56,7 @@ namespace Cinemax.Controllers
         [Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
-            ViewBag.GenreId = new SelectList(_context.Genres.ToList(), "GenreId", "Name");
+            ViewBag.GenreId = new SelectList(_context.Genres.OrderBy(g => g.Name).ToList(), "GenreId", "Name");
             return View("Create");
         }
 
@@ -59,7 +65,7 @@ namespace Cinemax.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         //post method to create a movie 
-        public IActionResult Create([Bind("MovieId,MovieTitle,Director,ReleaseYear,Duration,GenreId")] Movie movie)
+        public IActionResult Create([Bind("MovieId,MovieTitle,Director,ReleaseYear,Duration,GenreId,Overview,TopCast")] Movie movie)
         {
             
             if (!_context.Genres.Any(g => g.GenreId == movie.GenreId))
@@ -68,7 +74,7 @@ namespace Cinemax.Controllers
             //checks if the input is valid
             if (!ModelState.IsValid)
             {
-                ViewBag.GenreId = new SelectList(_context.Genres.ToList(), "GenreId", "Name"); 
+                ViewBag.GenreId = new SelectList(_context.Genres.OrderBy(g => g.Name).ToList(), "GenreId", "Name"); 
 
                 return View("Create",movie);
             }
@@ -92,7 +98,7 @@ namespace Cinemax.Controllers
             {
                 return NotFound();
             }
-            ViewBag.GenreId = new SelectList(_context.Genres.ToList(), "GenreId", "Name");
+            ViewBag.GenreId = new SelectList(_context.Genres.OrderBy(g => g.Name).ToList(), "GenreId", "Name");
             //return the movie to the view
             return View("Edit",movie);
         }
@@ -100,7 +106,7 @@ namespace Cinemax.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         //post method to edit a movie
-        public IActionResult Edit(int id, [Bind("MovieId,MovieTitle,Director,ReleaseYear,Duration,GenreId")] Movie movie)
+        public IActionResult Edit(int id, [Bind("MovieId,MovieTitle,Director,ReleaseYear,Duration,GenreId,Overview,TopCast")] Movie movie)
         {
             if (id != movie.MovieId) return BadRequest();
             var existing = _context.Movies.Find(id);
@@ -110,7 +116,7 @@ namespace Cinemax.Controllers
             // validate the input of the user
             if (!ModelState.IsValid)
             {
-                ViewBag.GenreId = new SelectList(_context.Genres.ToList(), "GenreId","Name");
+                ViewBag.GenreId = new SelectList(_context.Genres.OrderBy(g => g.Name).ToList(), "GenreId", "Name");
                 return View("Edit",movie);
             }
 
@@ -120,6 +126,8 @@ namespace Cinemax.Controllers
             existing.ReleaseYear = movie.ReleaseYear;
             existing.Duration = movie.Duration;
             existing.GenreId = movie.GenreId;
+            existing.Overview = movie.Overview;
+            existing.TopCast = movie.TopCast;
             _context.SaveChanges();
 
             // redirect to list on the Index

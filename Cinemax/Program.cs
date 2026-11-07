@@ -1,4 +1,5 @@
 using Cinemax.Data;
+using System.Threading.RateLimiting;
 using Cinemax.Services;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
@@ -24,6 +25,15 @@ builder.Services.AddHttpClient<ITmdbClient, TmdbClient>(client =>
     client.Timeout = TimeSpan.FromSeconds(15);
 }).RemoveAllLoggers();
 builder.Services.AddScoped<MovieImporter>();
+builder.Services.AddScoped<MovieSearch>();
+builder.Services.AddMemoryCache(options => options.SizeLimit = 500);
+builder.Services.AddHostedService<CatalogueSync>();
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("search", context => PerAddress(context, 90));
+    options.AddPolicy("import", context => PerAddress(context, 15));
+});
 
 // Optional providers are enabled only when both credentials are configured.
 var authentication = builder.Services.AddAuthentication();
@@ -62,7 +72,9 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseStatusCodePagesWithReExecute("/Home/Status/{0}");
 app.UseRouting();
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -78,5 +90,9 @@ app.MapRazorPages()
    .WithStaticAssets();
 
 app.Run();
+
+static RateLimitPartition<string> PerAddress(HttpContext context, int perMinute) =>
+    RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = perMinute, Window = TimeSpan.FromMinutes(1) });
 
 public partial class Program { }

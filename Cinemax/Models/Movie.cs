@@ -6,15 +6,17 @@ namespace Cinemax.Models
     public class Movie : IValidatableObject
     {
         public int MovieId { get; set; }
-        [Required, StringLength(200)]
+        [Required(ErrorMessage = "Enter the movie title."), StringLength(200)]
         public string? MovieTitle { get; set; }
-        [Required, StringLength(150)]
+        [Required(ErrorMessage = "Enter the director's name."), StringLength(150)]
         public string? Director { get; set; }
+        [Required(ErrorMessage = "Enter the release year.")]
         public int ReleaseYear { get; set; }
-        [Range(1, 1440)]
+        [Required(ErrorMessage = "Enter the runtime in minutes.")]
+        [Range(1, 1440, ErrorMessage = "Enter a runtime from 1 to 1440 minutes.")]
         public int Duration { get; set; }
         [NotMapped]
-        public string DurationFormatted => $"{Duration / 60}h {Duration % 60}m";
+        public string DurationFormatted => Duration > 0 ? $"{Duration / 60}h {Duration % 60}m" : "Runtime unknown";
         [Range(1, int.MaxValue)]
         public int GenreId { get; set; }
         public Genre? Genre { get; set; }
@@ -27,6 +29,8 @@ namespace Cinemax.Models
         public string? PosterPath { get; set; }
         [StringLength(100)]
         public string? BackdropPath { get; set; }
+        public double? TmdbRating { get; set; }
+        public bool TmdbDetailsLoaded { get; set; }
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
 
         [NotMapped]
@@ -35,6 +39,8 @@ namespace Cinemax.Models
         public string? BackdropUrl => BackdropPath == null ? null : $"https://image.tmdb.org/t/p/w1280{BackdropPath}";
         [NotMapped]
         public double? AverageRating => Reviews.Count == 0 ? null : Reviews.Average(r => r.Rating);
+        [NotMapped]
+        public double? CardScore => TmdbRating ?? AverageRating * 2;
         public IEnumerable<ValidationResult> Validate(ValidationContext context)
         {
             if (ReleaseYear < 1888 || ReleaseYear > DateTime.UtcNow.Year + 2)
