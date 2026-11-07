@@ -9,7 +9,7 @@ namespace CinemaxTest;
 public class DatabaseSetupTests
 {
     private const string Email = "owner@example.com";
-    private const string Password = "Test-Passw0rd!";
+    private static readonly string Password = $"Aa1!{Guid.NewGuid()}";
 
     private static IConfiguration Config(string? email, string? password) =>
         new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?> {
