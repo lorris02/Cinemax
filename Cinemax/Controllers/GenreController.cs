@@ -16,7 +16,11 @@ namespace Cinemax.Controllers
         //index method to return the view
         public IActionResult Index()
         {
-            var genres = _context.Genres.ToList();
+            var genres = _context.Genres.OrderBy(g => g.Name).ToList();
+            var movies = _context.Movies.Select(m => new Models.Movie { GenreId = m.GenreId, BackdropPath = m.BackdropPath, TmdbRating = m.TmdbRating }).ToList();
+            ViewBag.Covers = movies.GroupBy(m => m.GenreId).ToDictionary(group => group.Key, group => (
+                group.OrderByDescending(m => m.TmdbRating).FirstOrDefault(m => m.BackdropPath != null)?.BackdropUrl,
+                group.Count()));
             return View(genres);
         }
         //Get method to return the create view

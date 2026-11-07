@@ -18,6 +18,7 @@ namespace Cinemax.Data
         {
             base.OnModelCreating(builder);
             builder.Entity<Movie>().HasIndex(m => m.TmdbId).IsUnique();
+            builder.Entity<Review>().HasIndex(r => r.TmdbReviewId).IsUnique();
         }
     }
 }

@@ -11,16 +11,24 @@ namespace Cinemax.Controllers
     public class ReviewController : Controller
     {
         //constructor to instantiate the db context
+        private const int PageSize = 20;
         private readonly ApplicationDbContext _context;
         public ReviewController(ApplicationDbContext context)
         {
             _context = context;
         }
-        public IActionResult Index()
+        public IActionResult Index(int page = 1)
         {
-            // fetch list of reviews from db including movie info, and order it by reviewer name
+            var pages = Math.Max(1, (int)Math.Ceiling(_context.Reviews.Count() / (double)PageSize));
+            page = Math.Clamp(page, 1, pages);
+            ViewBag.Page = page;
+            ViewBag.Pages = pages;
+            // viewers' own reviews come first, newest at the top
             var reviews = _context.Reviews
-                .OrderByDescending(r => r.ReviewId)
+                .OrderBy(r => r.TmdbReviewId != null)
+                .ThenByDescending(r => r.ReviewId)
+                .Skip((page - 1) * PageSize)
+                .Take(PageSize)
                 .Include(r => r.Movie)
                 .ToList();
 
@@ -34,9 +42,10 @@ namespace Cinemax.Controllers
         {
             // fetch list of movietitles for the movieid dropdown in the form
             ViewBag.MovieId = new SelectList(_context.Movies.OrderBy(m => m.MovieTitle).ToList(), "MovieId", "MovieTitle", movieId);
+            ViewBag.Movie = _context.Movies.Find(movieId ?? 0);
 
             // display empty form so users can add a review
-            return View();
+            return View(new Review { MovieId = movieId ?? 0 });
         }
 
         // post method to add a review
@@ -53,7 +62,8 @@ namespace Cinemax.Controllers
             if (!ModelState.IsValid)
             {
                 // fetch list of movies for movieid dropdown in the form
-                ViewBag.MovieId = new SelectList(_context.Movies.ToList(), "MovieId","MovieTitle");
+                ViewBag.MovieId = new SelectList(_context.Movies.OrderBy(m => m.MovieTitle).ToList(), "MovieId", "MovieTitle", review.MovieId);
+                ViewBag.Movie = _context.Movies.Find(review.MovieId);
                 return View(review);
             }
 
