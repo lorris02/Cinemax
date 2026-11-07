@@ -1253,6 +1253,45 @@ textarea.form-control {
     text-align: center;
 }
 
+/* Email confirmation and password reset */
+.form-status {
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    border: 1px solid rgba(95, 208, 143, 0.35);
+    border-radius: var(--radius-sm);
+    background: rgba(95, 208, 143, 0.1);
+    color: var(--good);
+}
+
+.form-aside {
+    margin: -4px 0 14px;
+}
+
+.login-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.login-row .form-label {
+    margin: 0;
+}
+
+.muted-note {
+    color: var(--muted);
+}
+
+.account-note p:first-child strong {
+    color: var(--ink);
+    word-break: break-all;
+}
+
+.account-note .btn {
+    margin-top: 8px;
+}
+
 .account-form .sub-label {
     margin: 24px 0 8px;
     color: var(--muted);

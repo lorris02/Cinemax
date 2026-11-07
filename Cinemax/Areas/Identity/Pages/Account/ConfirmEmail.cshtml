@@ -1,0 +1,14 @@
+@page
+@model ConfirmEmailModel
+@{
+    ViewData["Title"] = "Confirm email";
+}
+
+<div class="account-form">
+    <h1>Link expired</h1>
+    <div class="form-card account-note">
+        <p>That confirmation link has expired or was already used.</p>
+        <a class="w-100 btn btn-lg btn-primary" asp-page="./ResendEmailConfirmation">Get a new link</a>
+    </div>
+    <p class="account-switch">Confirmed already? <a asp-page="./Login">Log in</a></p>
+</div>

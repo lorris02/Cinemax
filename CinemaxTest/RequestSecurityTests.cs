@@ -102,14 +102,19 @@ public class RequestSecurityTests
     }
 
     [TestMethod]
-    public async Task AccountPagesHideSetupNotesAndUnusedEmailLinks()
+    public async Task AccountPagesHideSetupNotes()
     {
         foreach (var path in new[] { "/Identity/Account/Login", "/Identity/Account/Register" })
-        {
-            var page = await client.GetStringAsync(path);
-            foreach (var hidden in new[] { "external authentication services", "ForgotPassword", "ResendEmailConfirmation" })
-                Assert.IsFalse(page.Contains(hidden), $"{path} shows {hidden}");
-        }
+            Assert.IsFalse((await client.GetStringAsync(path)).Contains("external authentication services"), path);
+        StringAssert.Contains(await client.GetStringAsync("/Identity/Account/Login"), "ForgotPassword");
+    }
+
+    [TestMethod]
+    public async Task EmailPagesOpen()
+    {
+        foreach (var path in new[] { "/Identity/Account/ForgotPassword", "/Identity/Account/ForgotPasswordConfirmation",
+            "/Identity/Account/ResendEmailConfirmation", "/Identity/Account/ResetPasswordConfirmation", "/Identity/Account/ConfirmEmail" })
+            Assert.AreEqual(HttpStatusCode.OK, (await client.GetAsync(path)).StatusCode, path);
     }
 
     [TestMethod]

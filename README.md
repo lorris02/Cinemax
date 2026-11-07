@@ -8,7 +8,7 @@ An ASP.NET Core movie site with real posters, cast details, search, and viewer r
 - Live search by title, director, or cast, with results from TMDB for anything else
 - Open a movie page with its plot, cast, scores, and viewer reviews
 - Read member reviews from TMDB, credited to their authors, alongside reviews posted on Cinemax
-- Register and sign in with ASP.NET Core Identity
+- Register and sign in with ASP.NET Core Identity, with email confirmation and password reset by email
 - Signed-in visitors can add reviews
 - Administrators add movies, manage entries, and moderate reviews
 - Server-side validation and protected forms
@@ -23,6 +23,8 @@ dotnet test Cinemax.sln
 ```
 
 Set `Tmdb__ApiKey` privately to load 24 popular movies on the first run and turn on TMDB search for administrators. Without it, movies can still be added by hand.
+
+Account emails go through [Resend](https://resend.com). Set `Email__ResendApiKey` and `Email__From` (a sender on a domain verified in Resend). Without a key, emails are written to the app log, so you can confirm accounts locally.
 
 Google and GitHub sign-in are optional. Configure their client IDs and secrets using `Authentication__Google__ClientId`, `Authentication__Google__ClientSecret`, `Authentication__GitHub__ClientId`, and `Authentication__GitHub__ClientSecret`. Supply credentials privately.
 
