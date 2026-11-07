@@ -4,8 +4,10 @@ An ASP.NET Core movie site with real posters, cast details, search, and viewer r
 
 ## Features
 
-- Browse and search movies with data from TMDB
-- Open a movie page with its plot, cast, and viewer reviews
+- Browse 300 movies with data from TMDB, filtered by genre
+- Live search by title, director, or cast, with results from TMDB for anything else
+- Open a movie page with its plot, cast, scores, and viewer reviews
+- Read member reviews from TMDB, credited to their authors, alongside reviews posted on Cinemax
 - Register and sign in with ASP.NET Core Identity
 - Signed-in visitors can add reviews
 - Administrators add movies, manage entries, and moderate reviews
