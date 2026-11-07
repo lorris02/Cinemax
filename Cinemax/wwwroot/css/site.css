@@ -111,6 +111,24 @@ a:hover {
     max-width: 760px;
 }
 
+.account-form {
+    max-width: 440px;
+    margin: 0 auto;
+}
+
+.account-form h1 {
+    margin-bottom: 20px;
+}
+
+.account-switch {
+    margin: 18px 0 0;
+    color: var(--muted);
+}
+
+.account-form .sub-label {
+    margin: 24px 0 8px;
+}
+
 .lead-text,
 .hero-meta,
 .movie-card-meta,
