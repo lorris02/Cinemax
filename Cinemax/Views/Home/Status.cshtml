@@ -1,0 +1,15 @@
+@{
+    int code = ViewBag.Code;
+    var missing = code == 404;
+    ViewData["Title"] = missing ? "Page not found" : "Something went wrong";
+}
+
+<div class="page narrow state-page">
+    <p class="state-code">@code</p>
+    <h1>@ViewData["Title"]</h1>
+    <p class="lead-text">@(missing ? "That page doesn't exist or has been moved." : "Please try again in a moment.")</p>
+    <div class="hero-actions">
+        <a class="btn btn-primary" asp-controller="Movie" asp-action="Index">Browse movies</a>
+        <a class="btn btn-ghost" asp-controller="Home" asp-action="Index">Go home</a>
+    </div>
+</div>

@@ -1,50 +1,24 @@
-﻿@model Cinemax.Models.Movie
+@model Cinemax.Models.Movie
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Add a movie";
+    ViewData["FormAction"] = "Create";
+    ViewData["SubmitText"] = "Add movie";
 }
 
-<h4>Add a Movie</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="MovieTitle" class="control-label">Movie Title</label>
-                <input asp-for="MovieTitle" class="form-control" />
-                <span asp-validation-for="MovieTitle" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Director" class="control-label">Director</label>
-                <input asp-for="Director" class="form-control" />
-                <span asp-validation-for="Director" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ReleaseYear" class="control-label">Year Released</label>
-                <input asp-for="ReleaseYear" class="form-control" />
-                <span asp-validation-for="ReleaseYear" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Duration" class="control-label">Movie Duration</label>
-                <input asp-for="Duration" class="form-control" />
-                <span asp-validation-for="Duration" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="GenreId" class="control-label">Genre</label>
-                <select asp-for="GenreId" class ="form-control" asp-items="ViewBag.GenreId"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+<div class="page narrow">
+    <a class="back-link" asp-action="Index">&larr; Back to movies</a>
+    <h1>Add a movie</h1>
+    <div class="tip-card">
+        <div>
+            <strong>Is it on TMDB?</strong>
+            <p>Importing fills in the poster, summary, cast and reviews for you.</p>
+        </div>
+        <a class="btn btn-ghost btn-sm" asp-controller="MovieImport" asp-action="Index">Add from TMDB</a>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
+    <partial name="_MovieForm" model="Model" view-data="ViewData" />
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <partial name="_ValidationScriptsPartial" />
 }

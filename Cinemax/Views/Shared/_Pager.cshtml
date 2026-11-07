@@ -1,0 +1,27 @@
+@{
+    int current = ViewBag.Page;
+    int pages = ViewBag.Pages;
+    var route = (ViewData["Route"] as Dictionary<string, string?>) ?? new();
+    string Link(int number)
+    {
+        var values = new Microsoft.AspNetCore.Routing.RouteValueDictionary();
+        foreach (var pair in route) { values[pair.Key] = pair.Value; }
+        values["page"] = number;
+        return Url.Action("Index", values)!;
+    }
+}
+
+@if (pages > 1)
+{
+    <nav class="pager" aria-label="Pages">
+        @if (current > 1)
+        {
+            <a class="btn btn-ghost" href="@Link(current - 1)" rel="prev">Previous</a>
+        }
+        <span class="pager-count">Page @current of @pages</span>
+        @if (current < pages)
+        {
+            <a class="btn btn-ghost" href="@Link(current + 1)" rel="next">Next</a>
+        }
+    </nav>
+}

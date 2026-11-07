@@ -1,47 +1,22 @@
-﻿@model Cinemax.Models.Review
+@model Cinemax.Models.Review
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit review";
 }
 
-<h4>Editing Your Review</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="ReviewerName" class="control-label">Name</label>
-                <input asp-for="ReviewerName" class="form-control" />
-                <span asp-validation-for="ReviewerName" class="text-danger"></span>
-            </div>
-            <input type="hidden" asp-for="ReviewId" />
-            <div class="form-group">
-                <label asp-for="ReviewMessage" class="control-label">Review</label>
-                <input asp-for="ReviewMessage" class="form-control" />
-                <span asp-validation-for="ReviewMessage" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Rating" class="control-label"></label>
-                <input asp-for="Rating" class="form-control" />
-                <span asp-validation-for="Rating" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MovieId" class="control-label">Movie Title</label>
-                <select asp-for="MovieId" class="form-control" asp-items="ViewBag.MovieId"></select>
-                <span asp-validation-for="MovieId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
+<div class="page narrow">
+    <a class="back-link" asp-action="Index">&larr; Back to reviews</a>
+    <h1>Edit review</h1>
+    <form asp-action="Edit" class="form-card">
+        <input type="hidden" asp-for="ReviewId" />
+        <partial name="_ReviewFields" model="Model" />
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save changes</button>
+            <a class="btn btn-ghost" asp-action="Index">Cancel</a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <partial name="_ValidationScriptsPartial" />
 }

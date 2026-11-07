@@ -5,34 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Cinemax</title>
     <script type="importmap"></script>
+    <meta name="description" content="Find movies, read viewer reviews and share your own on Cinemax." />
+    <meta name="theme-color" content="#0b0b0f" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" />
+    <link rel="preconnect" href="https://image.tmdb.org" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Cinemax.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-md site-nav">
-            <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg site-nav">
+            <div class="nav-inner">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">CINEMAX</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#site-menu" aria-controls="site-menu"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-md-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Movie" asp-action="Index">Movies</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Review" asp-action="Index">Reviews</a>
-                        </li>
-                        <li class="nav-item">
-								<a class="nav-link" asp-area="" asp-controller="Genre" asp-action="Index">Genres</a>
-                         </li>  
-                         
+                @if (ViewData["HideNavSearch"] as bool? != true)
+                {
+                    <form class="nav-search search-box" method="get" asp-area="" asp-controller="Movie" asp-action="Index" role="search">
+                        <input class="form-control" type="search" name="q" placeholder="Search movies, directors, cast" aria-label="Search movies" autocomplete="off" data-live-search />
+                    </form>
+                }
+                <div class="collapse navbar-collapse" id="site-menu">
+                    <ul class="navbar-nav">
+                        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Movie" asp-action="Index">Movies</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Review" asp-action="Index">Reviews</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Genre" asp-action="Index">Genres</a></li>
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
@@ -40,12 +41,29 @@
         </nav>
     </header>
     <main role="main">
+        @if (TempData["Notice"] is string notice)
+        {
+            <p class="notice" role="status">@notice</p>
+        }
         @RenderBody()
     </main>
+    <form id="open-tmdb" method="post" asp-area="" asp-controller="Search" asp-action="Open" hidden>
+        <input type="hidden" name="tmdbId" />
+    </form>
 
     <footer class="site-footer">
-        <div>&copy; @DateTime.UtcNow.Year Cinemax &middot; <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></div>
-        <div>Movie data and images from <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">TMDB</a>. This product uses the TMDB API but is not endorsed or certified by TMDB.</div>
+        <div class="footer-inner">
+            <div>
+                <a class="footer-brand" asp-area="" asp-controller="Home" asp-action="Index">CINEMAX</a>
+                <p>Movie data and images from <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">TMDB</a>. This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+            </div>
+            <div class="footer-links">
+                <a asp-area="" asp-controller="Movie" asp-action="Index">Movies</a>
+                <a asp-area="" asp-controller="Review" asp-action="Index">Reviews</a>
+                <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </div>
+        </div>
+        <small>&copy; @DateTime.UtcNow.Year Cinemax</small>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

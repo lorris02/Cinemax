@@ -1,0 +1,7 @@
+@model string
+<a class="back-link" href="@ViewData["BackUrl"]">&larr; @ViewData["BackText"]</a>
+<h1>@Model</h1>
+@if (ViewData["Intro"] is string intro)
+{
+    <p class="lead-text">@intro</p>
+}
