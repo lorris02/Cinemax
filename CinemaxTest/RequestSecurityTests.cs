@@ -113,9 +113,9 @@ public class RequestSecurityTests
     public async Task CustomerCannotModerateCatalogueOrReviews()
     {
         client.DefaultRequestHeaders.Add("X-Test-Role", "Customer");
-        foreach (var path in new[] { "/Movie/Edit/1", "/Review/Edit/1", "/Genre/Create", "/Genre/Edit/1" })
+        foreach (var path in new[] { "/Movie/Create", "/Movie/Edit/1", "/Review/Edit/1", "/Genre/Create", "/Genre/Edit/1" })
             Assert.AreEqual(HttpStatusCode.Forbidden, (await client.GetAsync(path)).StatusCode, path);
-        foreach (var path in new[] { "/Movie/Delete/1", "/Review/Delete/1", "/Genre/Delete/1", "/Movie/Edit/1", "/Review/Edit/1", "/Genre/Edit/1" })
+        foreach (var path in new[] { "/Movie/Create", "/Movie/Delete/1", "/Review/Delete/1", "/Genre/Delete/1", "/Movie/Edit/1", "/Review/Edit/1", "/Genre/Edit/1" })
             Assert.AreEqual(HttpStatusCode.Forbidden, (await client.PostAsync(path, new FormUrlEncodedContent(new Dictionary<string, string>()))).StatusCode, path);
     }
     [TestMethod]
