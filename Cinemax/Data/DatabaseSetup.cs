@@ -1,3 +1,4 @@
+using Cinemax.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,6 +7,7 @@ namespace Cinemax.Data
     public static class DatabaseSetup
     {
         public const string AdminRole = "Administrator";
+        private const int StarterMovies = 24;
 
         public static async Task RunAsync(IServiceProvider services, IConfiguration configuration)
         {
@@ -19,6 +21,25 @@ namespace Cinemax.Data
 
             var logger = provider.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(DatabaseSetup));
             await CreateAdminAsync(provider, configuration, logger);
+            await FillCatalogueAsync(provider, db, logger);
+        }
+
+        // A TMDB outage should never stop the site from starting.
+        private static async Task FillCatalogueAsync(IServiceProvider provider, ApplicationDbContext db, ILogger logger)
+        {
+            if (!provider.GetRequiredService<ITmdbClient>().Enabled || await db.Movies.AnyAsync())
+            {
+                return;
+            }
+            try
+            {
+                var added = await provider.GetRequiredService<MovieImporter>().ImportPopularAsync(StarterMovies);
+                logger.LogInformation("Added {Count} starter movies from TMDB.", added);
+            }
+            catch (Exception e) when (e is HttpRequestException or TaskCanceledException)
+            {
+                logger.LogWarning("Could not add starter movies from TMDB: {Reason}", e.GetType().Name);
+            }
         }
 
         // Only an account created here becomes admin, so nobody can claim the role by signing up with the admin email.

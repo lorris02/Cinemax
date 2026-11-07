@@ -40,6 +40,10 @@ namespace Cinemax.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("BackdropPath")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Director")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -56,12 +60,30 @@ namespace Cinemax.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Overview")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PosterPath")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("ReleaseYear")
                         .HasColumnType("INTEGER");
+
+                    b.Property<int?>("TmdbId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TopCast")
+                        .HasMaxLength(300)
+                        .HasColumnType("TEXT");
 
                     b.HasKey("MovieId");
 
                     b.HasIndex("GenreId");
+
+                    b.HasIndex("TmdbId")
+                        .IsUnique();
 
                     b.ToTable("Movies");
                 });
@@ -305,7 +327,7 @@ namespace Cinemax.Data.Migrations
             modelBuilder.Entity("Cinemax.Models.Review", b =>
                 {
                     b.HasOne("Cinemax.Models.Movie", "Movie")
-                        .WithMany()
+                        .WithMany("Reviews")
                         .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -362,6 +384,11 @@ namespace Cinemax.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Cinemax.Models.Movie", b =>
+                {
+                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }

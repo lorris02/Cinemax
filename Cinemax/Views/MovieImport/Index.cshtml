@@ -1,0 +1,40 @@
+@model IEnumerable<Cinemax.Services.TmdbMovieSummary>
+
+@{
+    ViewData["Title"] = "Add from TMDB";
+    var error = (TempData["ImportError"] as string) ?? (ViewBag.Error as string);
+}
+
+<div class="page narrow">
+    <h1>Add from TMDB</h1>
+    @if (ViewBag.Enabled != true)
+    {
+        <p class="empty-state">Set the private TMDB API key to use this page.</p>
+    }
+    else
+    {
+        <form class="filter-bar" method="get" asp-action="Index" role="search">
+            <input class="form-control" type="search" name="q" value="@ViewBag.Query" placeholder="Search TMDB" aria-label="Search TMDB" />
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+        @if (error != null)
+        {
+            <p class="text-danger" role="alert">@error</p>
+        }
+        <ul class="import-list">
+            @foreach (var movie in Model)
+            {
+                <li>
+                    <div>
+                        <strong>@movie.Title</strong>
+                        <small>@(movie.ReleaseDate?.Length >= 4 ? movie.ReleaseDate[..4] : "Year unknown")</small>
+                    </div>
+                    <form asp-action="Add" method="post">
+                        <input type="hidden" name="tmdbId" value="@movie.Id" />
+                        <button type="submit" class="btn btn-outline-light btn-sm">Add</button>
+                    </form>
+                </li>
+            }
+        </ul>
+    }
+</div>

@@ -1,4 +1,5 @@
 using Cinemax.Data;
+using Cinemax.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,14 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddRoles<IdentityRole>()// enables role management
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+// The client logger is removed so the API key in request URLs never reaches the logs.
+builder.Services.AddHttpClient<ITmdbClient, TmdbClient>(client =>
+{
+    client.BaseAddress = new Uri("https://api.themoviedb.org/3/");
+    client.Timeout = TimeSpan.FromSeconds(15);
+}).RemoveAllLoggers();
+builder.Services.AddScoped<MovieImporter>();
 
 // Optional providers are enabled only when both credentials are configured.
 var authentication = builder.Services.AddAuthentication();
