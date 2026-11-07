@@ -13,9 +13,6 @@
             @if (User.IsInRole("Administrator"))
             {
                 <a class="btn btn-outline-light btn-sm" asp-controller="MovieImport" asp-action="Index">Add from TMDB</a>
-            }
-            @if (User.Identity?.IsAuthenticated == true)
-            {
                 <a class="btn btn-outline-light btn-sm" asp-action="Create">Add manually</a>
             }
         </div>
