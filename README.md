@@ -7,8 +7,8 @@ An ASP.NET Core movie site with real posters, cast details, search, and viewer r
 - Browse and search movies with data from TMDB
 - Open a movie page with its plot, cast, and viewer reviews
 - Register and sign in with ASP.NET Core Identity
-- Signed-in visitors can add movies and reviews
-- Administrators add movies from TMDB, manage entries, and moderate reviews
+- Signed-in visitors can add reviews
+- Administrators add movies, manage entries, and moderate reviews
 - Server-side validation and protected forms
 
 ## Run locally
