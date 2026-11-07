@@ -1,0 +1,20 @@
+@model Cinemax.Models.Movie
+
+<a class="movie-card" asp-controller="Movie" asp-action="Details" asp-route-id="@Model.MovieId">
+    @if (Model.PosterUrl != null)
+    {
+        <img src="@Model.PosterUrl" alt="Poster for @Model.MovieTitle" loading="lazy" width="500" height="750" />
+    }
+    else
+    {
+        <span class="poster-empty">@Model.MovieTitle</span>
+    }
+    <span class="movie-card-title">@Model.MovieTitle</span>
+    <span class="movie-card-meta">
+        @Model.ReleaseYear
+        @if (Model.AverageRating is double rating)
+        {
+            <text> &middot; &#9733; @rating.ToString("0.0")</text>
+        }
+    </span>
+</a>
