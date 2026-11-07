@@ -1,7 +1,9 @@
 ﻿using Cinemax.Controllers;
 using Cinemax.Data;
 using Cinemax.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -68,7 +70,53 @@ public class MovieControllerTests
         _context.Movies.AddRange(movies);
         _context.SaveChanges();
 
-        _controller = new MovieController(_context);
+        _controller = new MovieController(_context)
+        {
+            TempData = new TempDataDictionary(new DefaultHttpContext(), new NoTempDataStore())
+        };
+    }
+
+    private class NoTempDataStore : ITempDataProvider
+    {
+        public IDictionary<string, object> LoadTempData(HttpContext context) => new Dictionary<string, object>();
+        public void SaveTempData(HttpContext context, IDictionary<string, object> values) { }
+    }
+
+    [TestMethod]
+    public void CreateConfirmsTheNewMovie()
+    {
+        _controller.Create(new Movie { MovieTitle = "Brand New", Director = "D", ReleaseYear = 2023, Duration = 100, GenreId = 1 });
+        Assert.AreEqual("Brand New was added to Cinemax.", _controller.TempData["Success"]);
+    }
+
+    [TestMethod]
+    public void CreateRejectsAMovieAlreadyInTheCatalogue()
+    {
+        var original = _context.Movies.First();
+        var copy = new Movie { MovieTitle = $" {original.MovieTitle!.ToUpper()} ", Director = "D", ReleaseYear = original.ReleaseYear, Duration = 100, GenreId = original.GenreId };
+        var count = _context.Movies.Count();
+
+        var result = (ViewResult)_controller.Create(copy);
+
+        Assert.AreEqual("Create", result.ViewName);
+        Assert.AreEqual(count, _context.Movies.Count());
+        StringAssert.Contains(_controller.ModelState[nameof(Movie.MovieTitle)]!.Errors[0].ErrorMessage, "already in Cinemax");
+    }
+
+    [TestMethod]
+    public void SameTitleFromAnotherYearIsAllowed()
+    {
+        var original = _context.Movies.First();
+        var remake = new Movie { MovieTitle = original.MovieTitle, Director = "D", ReleaseYear = original.ReleaseYear + 1, Duration = 100, GenreId = original.GenreId };
+        Assert.IsInstanceOfType(_controller.Create(remake), typeof(RedirectToActionResult));
+    }
+
+    [TestMethod]
+    public void EditingAMovieDoesNotCountAsADuplicateOfItself()
+    {
+        var original = _context.Movies.AsNoTracking().First();
+        original.Duration = 99;
+        Assert.IsInstanceOfType(_controller.Edit(original.MovieId, original), typeof(RedirectToActionResult));
     }
 
     [TestMethod]

@@ -163,6 +163,19 @@ public class TmdbTests
     }
 
     [TestMethod]
+    public async Task KnownMoviesMapTmdbIdsToCatalogueIds()
+    {
+        using var db = Database();
+        var tmdb = new FakeTmdb();
+        tmdb.Movies[8] = Sample(8);
+        var importer = new MovieImporter(db, tmdb);
+        var movie = await importer.ImportAsync(8);
+        var known = await importer.KnownAsync(new[] { 8, 9 });
+        Assert.AreEqual(1, known.Count);
+        Assert.AreEqual(movie!.MovieId, known[8]);
+    }
+
+    [TestMethod]
     public void LongReviewsEndAtAWord()
     {
         var text = MovieImporter.ShortReview(string.Join(' ', Enumerable.Repeat("word", 400)));

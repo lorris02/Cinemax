@@ -71,6 +71,7 @@ namespace Cinemax.Controllers
             if (!_context.Genres.Any(g => g.GenreId == movie.GenreId))
                 ModelState.AddModelError(nameof(movie.GenreId), "Choose an existing genre.");
             movie.MovieId = 0;
+            RejectDuplicate(movie);
             //checks if the input is valid
             if (!ModelState.IsValid)
             {
@@ -83,6 +84,7 @@ namespace Cinemax.Controllers
             _context.Movies.Add(movie);
             //saves the changes to the db
             _context.SaveChanges();
+            TempData["Success"] = $"{movie.MovieTitle} was added to Cinemax.";
             //redirects to the user to the index 
             return RedirectToAction("Index");
         }
@@ -113,6 +115,7 @@ namespace Cinemax.Controllers
             if (existing == null) return NotFound();
             if (!_context.Genres.Any(g => g.GenreId == movie.GenreId))
                 ModelState.AddModelError(nameof(movie.GenreId), "Choose an existing genre.");
+            RejectDuplicate(movie);
             // validate the input of the user
             if (!ModelState.IsValid)
             {
@@ -129,6 +132,7 @@ namespace Cinemax.Controllers
             existing.Overview = movie.Overview;
             existing.TopCast = movie.TopCast;
             _context.SaveChanges();
+            TempData["Success"] = $"{movie.MovieTitle} was updated.";
 
             // redirect to list on the Index
             return RedirectToAction("Index");
@@ -149,8 +153,19 @@ namespace Cinemax.Controllers
             _context.Movies.Remove(movie);
             //save changes to db
             _context.SaveChanges();
+            TempData["Success"] = $"{movie.MovieTitle} was removed.";
             //redirect the user to the index
             return RedirectToAction("Index");
+        }
+
+        private void RejectDuplicate(Movie movie)
+        {
+            var title = movie.MovieTitle?.Trim().ToLower();
+            if (title != null && _context.Movies.Any(m => m.MovieId != movie.MovieId
+                && m.ReleaseYear == movie.ReleaseYear && m.MovieTitle!.ToLower() == title))
+            {
+                ModelState.AddModelError(nameof(movie.MovieTitle), $"{movie.MovieTitle} ({movie.ReleaseYear}) is already in Cinemax.");
+            }
         }
 
     }

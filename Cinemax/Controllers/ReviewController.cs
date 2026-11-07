@@ -70,6 +70,7 @@ namespace Cinemax.Controllers
             // save to db then redirect to index
             _context.Reviews.Add(review);
             _context.SaveChanges();
+            TempData["Success"] = "Your review was posted.";
             return RedirectToAction("Details", "Movie", new { id = review.MovieId });
         }
 
@@ -119,6 +120,7 @@ namespace Cinemax.Controllers
             existing.Rating = review.Rating;
             existing.MovieId = review.MovieId;
             _context.SaveChanges();
+            TempData["Success"] = "The review was updated.";
             return RedirectToAction("Index");
         }
 
@@ -138,6 +140,7 @@ namespace Cinemax.Controllers
             // delete and then redirect to index
             _context.Reviews.Remove(review);
             _context.SaveChanges();
+            TempData["Success"] = "The review was removed.";
             return RedirectToAction("Index");
         }
 
