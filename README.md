@@ -2,6 +2,10 @@
 
 An ASP.NET Core movie site with real posters, cast details, search, and viewer reviews.
 
+**Live site:** [cinemax.jonathanilori.xyz](https://cinemax.jonathanilori.xyz)
+
+![Cinemax home page with a featured movie and popular titles](docs/screenshot.jpg)
+
 ## Features
 
 - Browse 300 movies with data from TMDB, filtered by genre
@@ -12,6 +16,7 @@ An ASP.NET Core movie site with real posters, cast details, search, and viewer r
 - Signed-in visitors can add reviews
 - Administrators add movies, manage entries, and moderate reviews
 - Server-side validation and protected forms
+- 51 automated tests (MSTest) covering permissions, request security, email flows and the TMDB client
 
 ## Run locally
 
